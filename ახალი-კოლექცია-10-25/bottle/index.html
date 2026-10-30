@@ -1,0 +1,147 @@
+<!doctype html>
+<!-- ამბავი · ახალი კოლექცია 10/25 · თეკლა &amp; სანდრო. ტექსტები და ფერები: config.js · 3D სამყარო: scene.js (ჩაშენებულია ქვემოთ, build.cjs-ით) · ძრავი: amb.js/amb.css -->
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>თეკლა &amp; სანდრო · ამბავი</title>
+<meta name="description" content="ჩვენ დავინიშნეთ! გიწვევთ ჩვენს ნიშნობაზე — თეკლა &amp; სანდრო">
+<meta property="og:title" content="💌 თეკლა &amp; სანდრო">
+<meta property="og:description" content="თქვენ მიიღეთ წერილი">
+<meta name="theme-color" content="#14112E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@300;400;500;600&family=Cormorant+Garamond:wght@500;600&family=Satisfy&display=swap">
+<link rel="stylesheet" href="amb.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<script src="config.js"></script>
+<script src="music.js"></script>
+<script src="amb.js"></script>
+<script type="module">
+import * as THREE from "three";
+/* ამბავი 2 · სცენების საერთო ხელსაწყოები */
+const seg = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const out = t => 1 - Math.pow(1 - t, 3);
+const inq = t => t * t;
+const back = t => { const c1 = 1.6, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const lerp = (a, b, k) => a + (b - a) * k;
+function rng(seed = 1){ let s = seed >>> 0 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+
+/* renderer + camera that keeps a subject of width `fitW` inside a portrait screen */
+function stage(THREE, canvas, { fov = 40, exposure = 1, fitW = 4, fitH = 6 } = {}){
+  const R = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+  R.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = exposure;
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(fov, 1, .05, 600);
+  const st = { R, scene, cam, dist: 10, aspect: 1 };
+  st.size = (w, h) => { if (st._w === w && st._h === h) return; st._w = w; st._h = h; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+    const tf = Math.tan(THREE.MathUtils.degToRad(fov / 2)); st.aspect = cam.aspect; st.dist = Math.max(fitH / (2 * tf), fitW / (2 * tf * cam.aspect)); };
+  return st;
+}
+function canvasTex(THREE, w, h, draw, srgb = true){ const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
+function skyTex(THREE, stops){ return canvasTex(THREE, 16, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); stops.forEach(([o, c]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(0, 0, w, h); }); }
+function dot(THREE, soft = .28){ return canvasTex(THREE, 64, 64, (g) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(soft, "rgba(255,255,255,.75)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }, false); }
+function glow(THREE, color, size, opacity = 1){ const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: dot(THREE, .18), color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending })); s.scale.setScalar(size); return s; }
+/* a cloud of soft points; returns { pts, pos, n } */
+function points(THREE, n, size, color, opts = {}){
+  const g = new THREE.BufferGeometry(), pos = new Float32Array(n * 3); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const m = new THREE.PointsMaterial({ size, color, map: dot(THREE), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, ...opts });
+  return { pts: new THREE.Points(g, m), pos, n, g };
+}
+async function envMap(THREE, R, intensity = .04){ const { RoomEnvironment } = await import("https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/environments/RoomEnvironment.js"); return new THREE.PMREMGenerator(R).fromScene(new RoomEnvironment(), intensity).texture; }
+function flash(k){ const f = document.getElementById("flash"); if (f) f.style.opacity = String(k); }
+
+/* ბოთლი ზღვაში · მზის ჩასვლა ზღვაზე, ტალღებზე მინის ბოთლი წერილით.
+   შეხებისას: ბოთლი ახლოს მოცურავს და დგება → საცობი ძვრება → წერილი ამოდის და იშლება სახელებით → კამერა წერილისკენ.
+   ფურცვლისას: კამერა ზემოთ მიდის, მზე ჩადის, ვარსკვლავები ჩნდება. */
+
+const __scene = async function(THREE, { canvas, C }){
+  await Promise.race([Promise.all(["500 60px \"Noto Serif Georgian\"", "400 60px \"Satisfy\"", "600 40px \"Cormorant Garamond\""].map(f => document.fonts.load(f, "ა&1"))), new Promise(r => setTimeout(r, 2500))]);
+  const S = stage(THREE, canvas, { fov: 42, exposure: 1.0, fitW: 3.4, fitH: 4.6 }), { R, scene, cam } = S, r = rng(13);
+  scene.background = skyTex(THREE, [[0, "#26245E"], [.32, "#7C4486"], [.56, "#E9735E"], [.76, "#FFAE68"], [1, "#FFD8A2"]]);
+  scene.environment = await envMap(THREE, R, .04); scene.environmentIntensity = .9;
+  scene.add(new THREE.HemisphereLight(0xffc9a8, 0x2a2050, .8));
+  const sunL = new THREE.DirectionalLight(0xffa860, 1.6); sunL.position.set(0, 3, -40); scene.add(sunL);
+  const fill = new THREE.DirectionalLight(0xffe2d0, .8); fill.position.set(2, 3, 8); scene.add(fill);
+  const sun = new THREE.Mesh(new THREE.CircleGeometry(6, 64), new THREE.MeshBasicMaterial({ color: 0xffd28a, fog: false })); scene.add(sun);
+  const sunG = glow(THREE, 0xffa45c, 40, .6); scene.add(sunG);
+  const stars = points(THREE, 500, .25, 0xffffff); for (let i = 0; i < stars.n; i++){ const a = r() * 6.28, e = .25 + r() * 1.2; stars.pos[i * 3] = Math.cos(a) * 90 * Math.cos(e); stars.pos[i * 3 + 1] = Math.sin(e) * 90; stars.pos[i * 3 + 2] = Math.sin(a) * 90 * Math.cos(e) - 30; } scene.add(stars.pts);
+
+  /* the sea */
+  const W = (x, z, t) => .16 * Math.sin(.6 * x + t * 1.1) + .13 * Math.sin(.8 * z - t * 1.4 + x * .3) + .05 * Math.sin(2.1 * (x + z) + t * 2.3);
+  const sea = new THREE.Mesh(new THREE.PlaneGeometry(260, 260, 220, 220), new THREE.ShaderMaterial({
+    uniforms: { uT: { value: 0 }, uSunY: { value: 1 } },
+    vertexShader: `uniform float uT; varying vec3 vW; varying float vH;
+      float W(float x, float z, float t){ return .16 * sin(.6 * x + t * 1.1) + .13 * sin(.8 * z - t * 1.4 + x * .3) + .05 * sin(2.1 * (x + z) + t * 2.3); }
+      void main(){ vec4 w = modelMatrix * vec4(position, 1.); float k = smoothstep(120., 20., length(w.xz)); w.y += W(w.x, w.z, uT) * k; vH = W(w.x, w.z, uT); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+    fragmentShader: `uniform float uT, uSunY; varying vec3 vW; varying float vH;
+      void main(){
+        float far = max(0., -vW.z);
+        float rip = sin(vW.x * 3.1 + uT * 1.7) * .5 + sin(vW.z * 4.3 - uT * 2.1) * .5;
+        float streak = exp(-pow(vW.x / (.5 + far * .09), 2.)) * smoothstep(-90., -2., vW.z);
+        vec3 deep = mix(vec3(.006, .008, .035), vec3(.07, .025, .06), smoothstep(-90., 0., vW.z));
+        vec3 col = deep + vec3(1., .55, .25) * streak * (.12 + .9 * pow(max(0., rip * .5 + .5), 4.)) * uSunY;
+        col += vec3(.95, .6, .55) * smoothstep(.15, .3, vH) * .12;
+        col = mix(col, vec3(.9, .42, .38), smoothstep(40., 120., length(vW.xz)) * .45);
+        gl_FragColor = vec4(col, 1.);
+        #include <colorspace_fragment>
+      }` }));
+  sea.rotation.x = -Math.PI / 2; scene.add(sea);
+
+  /* the bottle with a letter inside */
+  const prof = [[0, 0], [.27, 0], [.3, .04], [.3, .72], [.26, .86], [.13, 1.0], [.1, 1.08], [.1, 1.2], [.12, 1.22], [.1, 1.24]].map(([x, y]) => new THREE.Vector2(x, y - .6));
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0xd9f2e8, roughness: .04, transmission: .92, thickness: .35, ior: 1.5, clearcoat: 1, envMapIntensity: 1.6, side: THREE.DoubleSide });
+  const bottle = new THREE.Group(); bottle.add(new THREE.Mesh(new THREE.LatheGeometry(prof, 48), glass)); scene.add(bottle);
+  const cork = new THREE.Mesh(new THREE.CylinderGeometry(.095, .085, .2, 24), new THREE.MeshStandardMaterial({ color: 0x9a6a3e, roughness: .9 })); cork.position.y = .66; bottle.add(cork);
+  const roll = new THREE.Mesh(new THREE.CylinderGeometry(.075, .075, .62, 24), new THREE.MeshStandardMaterial({ color: 0xf3e6c8, roughness: .8 })); roll.position.y = -.12; bottle.add(roll);
+  const tie = new THREE.Mesh(new THREE.TorusGeometry(.08, .012, 8, 24), new THREE.MeshStandardMaterial({ color: 0xb5323c })); tie.rotation.x = Math.PI / 2; tie.position.y = -.12; bottle.add(tie);
+
+  /* the letter that unrolls */
+  const names = C.b ? C.a + " & " + C.b : C.a;
+  const paperTex = canvasTex(THREE, 640, 840, (g, w, h) => { g.fillStyle = "#f6ead0"; g.fillRect(0, 0, w, h); const rr = rng(2); for (let i = 0; i < 3000; i++){ g.fillStyle = `rgba(150,110,60,${rr() * .05})`; g.fillRect(rr() * w, rr() * h, 3, 3); }
+    const gr = g.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, 520); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(120,70,20,.25)"); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.textAlign = "center"; g.fillStyle = "#7a4a2a"; g.font = '500 30px "Noto Serif Georgian"'; g.fillText(C.paperTop || "ჩვენ დავინიშნეთ!", w / 2, 210);
+    g.fillStyle = "#3f2a1c"; g.font = `500 ${names.length > 14 ? 54 : 66}px "Noto Serif Georgian"`; g.fillText(C.a || "", w / 2, 340); if (C.b){ g.font = '400 64px "Satisfy", cursive'; g.fillStyle = "#c2603a"; g.fillText("&", w / 2, 420); g.fillStyle = "#3f2a1c"; g.font = `500 ${names.length > 14 ? 54 : 66}px "Noto Serif Georgian"`; g.fillText(C.b, w / 2, 510); }
+    g.fillStyle = "#7a4a2a"; g.font = '600 40px "Cormorant Garamond"'; const d = new Date(C.date + "T12:00:00"); g.fillText(String(d.getDate()).padStart(2, "0") + " · " + String(d.getMonth() + 1).padStart(2, "0") + " · " + d.getFullYear(), w / 2, 620);
+    g.strokeStyle = "rgba(122,74,42,.5)"; g.lineWidth = 2; g.beginPath(); g.moveTo(w / 2 - 90, 690); g.lineTo(w / 2 + 90, 690); g.stroke(); });
+  const paper = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 2.1), new THREE.MeshStandardMaterial({ map: paperTex, roughness: .9, side: THREE.DoubleSide, emissive: 0x302010, emissiveIntensity: .25 })); paper.visible = false; scene.add(paper);
+  const rollMat = new THREE.MeshStandardMaterial({ color: 0xeedcb6, roughness: .85 });
+  const rollL = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, 2.15, 20), rollMat), rollR = rollL.clone(); scene.add(rollL, rollR); rollL.visible = rollR.visible = false;
+  const pop = points(THREE, 120, .09, 0xfff0b8); scene.add(pop.pts); const pv = Array.from({ length: pop.n }, () => [r() * 6.28, r() * 2 - .4, .6 + r() * 2.4]);
+
+  /* gulls */
+  const gullG = new THREE.BufferGeometry(); gullG.setAttribute("position", new THREE.Float32BufferAttribute([-.5, .12, 0, 0, 0, 0, 0, 0, 0, .5, .12, 0, -.5, .12, 0, 0, .04, 0, 0, .04, 0, .5, .12, 0].slice(0, 18), 3));
+  const gulls = Array.from({ length: 5 }, (_, i) => { const m = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-.5, .15, 0), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0), new THREE.Vector3(.5, .15, 0)]), new THREE.LineBasicMaterial({ color: 0x2a1c30 })); m.position.set(-8 + i * 3.5, 4 + r() * 3, -14 - r() * 8); scene.add(m); return { m, v: .6 + r() * .5, ph: r() * 6 }; });
+
+  const OPEN = 3.8, tmp = new THREE.Vector3();
+  function update({ t, p, idle, w, h }){
+    S.size(w, h);
+    const on = t >= 0, come = on ? ease(seg(t, 0, 1.25)) : 0, popK = on ? seg(t, 1.2, 1.9) : 0, rise = on ? ease(seg(t, 1.55, 2.6)) : 0, spread = on ? out(seg(t, 2.2, 3.1)) : 0, Q = ease(p);
+    sea.material.uniforms.uT.value = idle; sea.material.uniforms.uSunY.value = 1 - Q * .7;
+    const bx = lerp(.9, 0, come), bz = lerp(-2.4, .4, come), wy = W(bx, bz, idle);
+    bottle.position.set(bx, lerp(wy + .02, .55 + wy * .4, come), bz);
+    bottle.rotation.set(Math.sin(idle * 1.1) * .12 * (1 - come), idle * .1 * (1 - come), lerp(1.42 + Math.sin(idle * .9) * .1, Math.sin(idle * 1.4) * .04, come));
+    cork.visible = popK < 1; if (popK > 0){ tmp.set(.35 * popK, .66 + popK * 1.7 - popK * popK * .9, .15 * popK); cork.position.copy(tmp); cork.rotation.set(popK * 9, 0, popK * 6); } else cork.position.set(0, .66, 0);
+    roll.visible = tie.visible = rise <= 0;
+    for (let i = 0; i < pop.n; i++){ const v = pv[i], k = popK > 0 ? Math.min(1, (t - 1.2) * .7) : 0; pop.pos[i * 3] = bottle.position.x + Math.cos(v[0]) * k * v[2]; pop.pos[i * 3 + 1] = bottle.position.y + .7 + v[1] * k + k * 1.2 - k * k * .8; pop.pos[i * 3 + 2] = bottle.position.z + Math.sin(v[0]) * k * v[2] * .4; }
+    pop.g.attributes.position.needsUpdate = true; pop.pts.material.opacity = popK > 0 ? 1 - seg(t, 1.7, 3) : 0;
+    paper.visible = rollL.visible = rollR.visible = rise > 0;
+    if (rise > 0){ const py = bottle.position.y + .7 + rise * 1.55, wdt = lerp(.02, 1.6, spread);
+      paper.position.set(0, py, bottle.position.z + .1); paper.scale.set(Math.max(.012, spread), lerp(.3, 1, rise), 1); paper.rotation.set(-.05, 0, Math.sin(idle * .9) * .02);
+      rollL.position.set(-wdt / 2, py, paper.position.z + .02); rollR.position.set(wdt / 2, py, paper.position.z + .02); rollL.scale.y = rollR.scale.y = lerp(.3, 1, rise); }
+    gulls.forEach(o => { o.m.position.x += .012 * o.v; if (o.m.position.x > 14) o.m.position.x = -14; const fl = Math.sin(idle * 5 + o.ph) * .12; const ps = o.m.geometry.attributes.position; ps.setY(0, .15 + fl); ps.setY(3, .15 + fl); ps.needsUpdate = true; });
+    sun.position.set(0, 2.2 - Q * 3.4, -95); sunG.position.copy(sun.position); stars.pts.material.opacity = Q * .9;
+    flash(on ? seg(t, 3.2, 3.6) * (1 - seg(t, 3.6, 4.4)) * .85 : 0);
+    const d = S.dist, near = on ? ease(seg(t, 2.6, OPEN)) : 0;
+    cam.position.set(Math.sin(idle * .2) * .15, lerp(1.25, 2.6, near) + Q * 5, lerp(d, d * .62, near) + Q * 4);
+    cam.lookAt(0, lerp(.55, 1.15, near) + Q * 3, lerp(0, 0, near) - Q * 30);
+    R.render(scene, cam);
+  }
+  return { open: OPEN, update };
+}
+
+window.AMB_SCENE = { THREE, create: __scene }; window.dispatchEvent(new Event("amb-scene"));
+</script>
+</body>
+</html>

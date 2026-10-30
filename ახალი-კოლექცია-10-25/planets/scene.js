@@ -1,0 +1,72 @@
+/* პლანეტები · საბავშვო დაბადების დღე: ღია კოსმოსი, ფერადი პლანეტები, შუაში — რაკეტა.
+   შეხებისას: უკუთვლა 3·2·1 (ნათება) → რაკეტა ცეცხლით აფრინდება → კამერა მიჰყვება → ვარსკვლავები ხაზებად (ჰიპერსიჩქარე) → დაბადების დღის პლანეტა.
+   ფურცვლისას: კამერა პლანეტებს შორის ნელა დაფრინავს. */
+import { stage, skyTex, glow, points, canvasTex, seg, ease, out, lerp, rng } from "./kit.js";
+
+export default async function(THREE, { canvas, C }){
+  await Promise.race([document.fonts.load('700 60px "Noto Sans Georgian"', "ა1"), new Promise(r => setTimeout(r, 2500))]);
+  const S = stage(THREE, canvas, { fov: 46, exposure: 1.05, fitW: 3.6, fitH: 5 }), { R, scene, cam } = S, r = rng(42);
+  scene.background = skyTex(THREE, [[0, "#0B0A2E"], [.5, "#24145A"], [1, "#3A1C6E"]]);
+  scene.add(new THREE.HemisphereLight(0xc9b8ff, 0x1a0f3a, .9));
+  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-4, 5, 6); scene.add(key);
+
+  /* stars (stretch into lines at warp) */
+  const NS = 900, sg = new THREE.BufferGeometry(), sp = new Float32Array(NS * 6), sv = [];
+  for (let i = 0; i < NS; i++) sv.push([(r() - .5) * 60, (r() - .5) * 90 + 20, -5 - r() * 60]);
+  sg.setAttribute("position", new THREE.BufferAttribute(sp, 3)); const starLines = new THREE.LineSegments(sg, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: .85 })); scene.add(starLines);
+  const twinkle = points(THREE, 300, .35, 0xfff3c0); for (let i = 0; i < twinkle.n; i++){ twinkle.pos[i * 3] = (r() - .5) * 50; twinkle.pos[i * 3 + 1] = (r() - .5) * 80 + 20; twinkle.pos[i * 3 + 2] = -8 - r() * 40; } scene.add(twinkle.pts);
+
+  /* planets */
+  const bandTex = (cols) => canvasTex(THREE, 256, 256, (g, w, h) => { const n = cols.length * 3; for (let i = 0; i < n; i++){ g.fillStyle = cols[i % cols.length]; g.fillRect(0, i * h / n, w, h / n + 1); } for (let i = 0; i < 40; i++){ g.fillStyle = "rgba(255,255,255,.08)"; g.beginPath(); g.arc(r() * w, r() * h, 4 + r() * 16, 0, 7); g.fill(); } });
+  const planet = (rad, cols, x, y, z, ring) => { const g = new THREE.Group(); const m = new THREE.Mesh(new THREE.SphereGeometry(rad, 48, 32), new THREE.MeshStandardMaterial({ map: bandTex(cols), roughness: .65 })); g.add(m);
+    if (ring){ const rg = new THREE.Mesh(new THREE.RingGeometry(rad * 1.35, rad * 2.1, 64), new THREE.MeshStandardMaterial({ color: ring, side: THREE.DoubleSide, transparent: true, opacity: .8, roughness: .5 })); rg.rotation.x = Math.PI / 2.4; g.add(rg); }
+    g.position.set(x, y, z); scene.add(g); return g; };
+  const P = [planet(2.2, ["#FF9F6B", "#FFC88A", "#F56D7A", "#FFD9A8"], -5.5, 6, -14, 0xffe3a8), planet(1.1, ["#6FD3FF", "#9AE6FF", "#4AA8E8"], 5, 3, -9, null), planet(.6, ["#B48CFF", "#D9B8FF"], -3.5, -1.5, -6, null),
+    planet(3.2, ["#5FE0B0", "#3BB894", "#A5F2D2", "#2E9C7E"], 6, 24, -16, 0xc9fff0), planet(1.6, ["#FF7AC6", "#FFB3DE", "#E04FA8"], -6, 32, -12, 0xffd1ec)];
+  const moonGlow = glow(THREE, 0x9f7bff, 30, .35); moonGlow.position.set(0, 10, -30); scene.add(moonGlow);
+
+  /* the birthday planet (destination) with the number painted on it */
+  const num = String(C.stageText || "6");
+  const bdTex = canvasTex(THREE, 1024, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#FFD36E"); gr.addColorStop(1, "#FF8A5C"); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 60; i++){ g.fillStyle = ["#FF6FA8", "#7AD3FF", "#FFFFFF", "#9B7BFF"][i % 4]; g.beginPath(); g.arc(r() * w, r() * h, 6 + r() * 10, 0, 7); g.fill(); }
+    g.fillStyle = "#fff"; g.strokeStyle = "#7A3BB8"; g.lineWidth = 14; g.textAlign = "center"; g.textBaseline = "middle"; g.font = '700 300px "Noto Sans Georgian"'; for (const x of [.25, .75]){ g.strokeText(num, w * x, h / 2 + 10); g.fillText(num, w * x, h / 2 + 10); } });
+  const bday = new THREE.Mesh(new THREE.SphereGeometry(2.4, 64, 48), new THREE.MeshStandardMaterial({ map: bdTex, roughness: .5, emissive: 0x402010, emissiveIntensity: .3 })); bday.position.set(0, 15.2, -5.5); scene.add(bday);
+  const bdRing = new THREE.Mesh(new THREE.TorusGeometry(3.6, .07, 8, 96), new THREE.MeshBasicMaterial({ color: 0xffe08a })); bdRing.rotation.x = Math.PI / 2.3; bdRing.position.copy(bday.position); scene.add(bdRing);
+  const bdGlow = glow(THREE, 0xffc070, 12, .5); bdGlow.position.copy(bday.position); scene.add(bdGlow);
+
+  /* the rocket */
+  const rocket = new THREE.Group(); scene.add(rocket);
+  const white = new THREE.MeshStandardMaterial({ color: 0xf6f3ff, roughness: .35, metalness: .1 }), red = new THREE.MeshStandardMaterial({ color: 0xff4f6a, roughness: .4 });
+  const body = new THREE.Mesh(new THREE.LatheGeometry([[0, 0], [.34, .05], [.42, .4], [.42, 1.2], [.34, 1.6], [.18, 1.9], [0, 2.05]].map(([x, y]) => new THREE.Vector2(x, y)), 40), white); rocket.add(body);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(.2, .3, 32), red); nose.position.y = 1.98; rocket.add(nose);
+  const win = new THREE.Mesh(new THREE.CircleGeometry(.16, 32), new THREE.MeshStandardMaterial({ color: 0x7ad3ff, emissive: 0x2a6aa0, emissiveIntensity: .8 })); win.position.set(0, 1.25, .425); rocket.add(win);
+  const winRim = new THREE.Mesh(new THREE.TorusGeometry(.17, .03, 8, 32), red); winRim.position.copy(win.position); rocket.add(winRim);
+  for (let i = 0; i < 3; i++){ const fin = new THREE.Mesh(new THREE.BoxGeometry(.05, .5, .38), red); const a = i / 3 * Math.PI * 2; fin.position.set(Math.cos(a) * .42, .28, Math.sin(a) * .42); fin.rotation.y = -a; rocket.add(fin); }
+  const flameMat = new THREE.MeshBasicMaterial({ color: 0xffb040, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+  const flame = new THREE.Mesh(new THREE.ConeGeometry(.3, 1.4, 24), flameMat); flame.rotation.x = Math.PI; flame.position.y = -.65; rocket.add(flame);
+  const core = glow(THREE, 0xffe0a0, .1, 0); core.position.y = -.4; rocket.add(core);
+  const smoke = points(THREE, 260, .5, 0xffd2f0, { blending: THREE.NormalBlending, opacity: .0 }); scene.add(smoke.pts); const smv = Array.from({ length: smoke.n }, () => [r() * 6.28, r(), r()]);
+  /* launch pad */
+  const pad = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, .25, 48), new THREE.MeshStandardMaterial({ color: 0x5a4a8a, roughness: .7 })); pad.position.y = -.14; scene.add(pad);
+  const padRing = new THREE.Mesh(new THREE.TorusGeometry(1.42, .04, 8, 64), new THREE.MeshBasicMaterial({ color: 0xffe08a })); padRing.rotation.x = Math.PI / 2; padRing.position.y = .0; scene.add(padRing);
+
+  const OPEN = 4.0;
+  function update({ t, p, idle, w, h }){
+    S.size(w, h);
+    const on = t >= 0, cnt = on ? seg(t, 0, 1.2) : 0, ign = on ? seg(t, .9, 1.3) : 0, fly = on ? Math.pow(seg(t, 1.2, OPEN), 1.6) : 0, warp = on ? Math.sin(seg(t, 1.8, 3.6) * Math.PI) : 0, Q = ease(p);
+    const ry = fly * 14.5, shakeK = ign * (1 - fly) * .03;
+    rocket.position.set(Math.sin(idle * 60) * shakeK, ry + (on ? 0 : Math.sin(idle * 1.5) * .02), 0); rocket.rotation.y = idle * .4 + fly * 3;
+    const fl = on ? ign : 0; flameMat.opacity = fl * .9; flame.scale.set(1 + Math.sin(idle * 50) * .1, .6 + fl * (1 + fly * 1.6) + Math.sin(idle * 40) * .15, 1); core.material.opacity = fl; core.scale.setScalar(.2 + fl * 2.4);
+    for (let i = 0; i < smoke.n; i++){ const v = smv[i], k = on ? Math.max(0, t - 1 - v[1] * .4) : 0, rr = k * (1.2 + v[2] * 2); smoke.pos[i * 3] = Math.cos(v[0]) * rr; smoke.pos[i * 3 + 1] = .1 + k * .3 * v[2]; smoke.pos[i * 3 + 2] = Math.sin(v[0]) * rr * .6; }
+    smoke.g.attributes.position.needsUpdate = true; smoke.pts.material.opacity = on ? seg(t, 1, 1.4) * (1 - seg(t, 2.5, 4)) * .7 : 0;
+    const len = .02 + warp * 2.4; for (let i = 0; i < NS; i++){ const v = sv[i]; sp[i * 6] = v[0]; sp[i * 6 + 1] = v[1]; sp[i * 6 + 2] = v[2]; sp[i * 6 + 3] = v[0]; sp[i * 6 + 4] = v[1] - len; sp[i * 6 + 5] = v[2]; } sg.attributes.position.needsUpdate = true;
+    starLines.material.opacity = .55 + warp * .4; twinkle.pts.material.opacity = .6 + Math.sin(idle * 3) * .3;
+    P.forEach((g, i) => { g.rotation.y = idle * (.1 + i * .03); }); bday.rotation.y = Math.sin(idle * .3) * .25; bdRing.rotation.z = idle * .2;
+    padRing.material.color.setHSL(.12, 1, .5 + cnt * .3 * Math.abs(Math.sin(t * 9)));
+    const d = S.dist, follow = Math.min(1, fly * 1.05);
+    cam.position.set(Math.sin(idle * .2) * .25 + Q * 2, lerp(1.2, 12.2, follow) + Q * 14, lerp(d, d * .72, follow) + Q * 3);
+    cam.lookAt(0, lerp(1.25, 15.8, follow) + Q * 14, lerp(0, -4, follow));
+    R.render(scene, cam);
+  }
+  return { open: OPEN, update };
+}

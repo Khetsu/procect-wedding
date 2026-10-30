@@ -1,0 +1,122 @@
+<!doctype html>
+<!-- ამბავი · ახალი კოლექცია 10/25 · სოფო &amp; დათო. ტექსტები და ფერები: config.js · 3D სამყარო: scene.js (ჩაშენებულია ქვემოთ, build.cjs-ით) · ძრავი: amb.js/amb.css -->
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>სოფო &amp; დათო · ამბავი</title>
+<meta name="description" content="ზამთრის ზღაპარში გიწვევთ ჩვენს ქორწილში — სოფო &amp; დათო">
+<meta property="og:title" content="💌 სოფო &amp; დათო">
+<meta property="og:description" content="თქვენ მიიღეთ მოსაწვევი">
+<meta name="theme-color" content="#060E1E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@300;400;500;600&family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&display=swap">
+<link rel="stylesheet" href="amb.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<script src="config.js"></script>
+<script src="music.js"></script>
+<script src="amb.js"></script>
+<script type="module">
+import * as THREE from "three";
+/* ამბავი 2 · სცენების საერთო ხელსაწყოები */
+const seg = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const out = t => 1 - Math.pow(1 - t, 3);
+const inq = t => t * t;
+const back = t => { const c1 = 1.6, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const lerp = (a, b, k) => a + (b - a) * k;
+function rng(seed = 1){ let s = seed >>> 0 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+
+/* renderer + camera that keeps a subject of width `fitW` inside a portrait screen */
+function stage(THREE, canvas, { fov = 40, exposure = 1, fitW = 4, fitH = 6 } = {}){
+  const R = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+  R.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = exposure;
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(fov, 1, .05, 600);
+  const st = { R, scene, cam, dist: 10, aspect: 1 };
+  st.size = (w, h) => { if (st._w === w && st._h === h) return; st._w = w; st._h = h; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+    const tf = Math.tan(THREE.MathUtils.degToRad(fov / 2)); st.aspect = cam.aspect; st.dist = Math.max(fitH / (2 * tf), fitW / (2 * tf * cam.aspect)); };
+  return st;
+}
+function canvasTex(THREE, w, h, draw, srgb = true){ const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
+function skyTex(THREE, stops){ return canvasTex(THREE, 16, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); stops.forEach(([o, c]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(0, 0, w, h); }); }
+function dot(THREE, soft = .28){ return canvasTex(THREE, 64, 64, (g) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(soft, "rgba(255,255,255,.75)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }, false); }
+function glow(THREE, color, size, opacity = 1){ const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: dot(THREE, .18), color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending })); s.scale.setScalar(size); return s; }
+/* a cloud of soft points; returns { pts, pos, n } */
+function points(THREE, n, size, color, opts = {}){
+  const g = new THREE.BufferGeometry(), pos = new Float32Array(n * 3); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const m = new THREE.PointsMaterial({ size, color, map: dot(THREE), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, ...opts });
+  return { pts: new THREE.Points(g, m), pos, n, g };
+}
+async function envMap(THREE, R, intensity = .04){ const { RoomEnvironment } = await import("https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/environments/RoomEnvironment.js"); return new THREE.PMREMGenerator(R).fromScene(new RoomEnvironment(), intensity).texture; }
+function flash(k){ const f = document.getElementById("flash"); if (f) f.style.opacity = String(k); }
+
+/* თოვლის გლობუსი · ზამთრის ღამე, თბილი ნათურები ბუნდოვნად, მაგიდაზე — მინის გლობუსი პატარა თოვლიანი სოფლით.
+   შეხებისას: გლობუსი ირყევა → თოვლი შიგნით ტრიალებს → კამერა გლობუსს უახლოვდება → ირგვლივაც თოვს.
+   ფურცვლისას: კამერა სოფლის თავზე ნელა ტრიალებს და ზემოთ იწევს. */
+
+const __scene = async function(THREE, { canvas }){
+  const S = stage(THREE, canvas, { fov: 40, exposure: 1.05, fitW: 3.4, fitH: 4.2 }), { R, scene, cam } = S, r = rng(17);
+  scene.background = skyTex(THREE, [[0, "#081428"], [.55, "#13284A"], [1, "#2A3E62"]]);
+  scene.environment = await envMap(THREE, R, .04); scene.environmentIntensity = .8;
+  scene.add(new THREE.HemisphereLight(0xbcd4ff, 0x2a2030, .7));
+  const key = new THREE.DirectionalLight(0xdfe9ff, 1.1); key.position.set(-3, 6, 5); scene.add(key);
+  const warm = new THREE.PointLight(0xffb45a, 4, 6, 1.6); warm.position.set(0, .2, .6); scene.add(warm);
+
+  /* blurred fairy lights behind */
+  for (let i = 0; i < 60; i++){ const s = glow(THREE, [0xffc56a, 0xffe2a0, 0xff9a5a, 0xbfe0ff][i % 4], .6 + r() * 1.4, .25 + r() * .45); s.position.set((r() - .5) * 22, -1 + r() * 12, -8 - r() * 12); scene.add(s); }
+  /* table */
+  const table = new THREE.Mesh(new THREE.CylinderGeometry(6, 6, .2, 64), new THREE.MeshStandardMaterial({ color: 0x3a2618, roughness: .45, metalness: .1 })); table.position.y = -1.62; scene.add(table);
+
+  /* the globe */
+  const globe = new THREE.Group(); scene.add(globe);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.05, 1.3, .55, 64), new THREE.MeshStandardMaterial({ color: 0x5a2e1c, roughness: .35, metalness: .2 })); base.position.y = -1.25; globe.add(base);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.08, .05, 12, 80), new THREE.MeshStandardMaterial({ color: 0xd9b060, metalness: 1, roughness: .2 })); ring.rotation.x = Math.PI / 2; ring.position.y = -.98; globe.add(ring);
+  const glassMat = new THREE.MeshPhysicalMaterial({ color: 0xdfeaff, roughness: 0, metalness: 0, clearcoat: 1, transparent: true, opacity: .2, envMapIntensity: 2.2, depthWrite: false });
+  const glass = new THREE.Mesh(new THREE.SphereGeometry(1.3, 64, 48), glassMat); glass.position.y = .05; globe.add(glass);
+  /* the village inside */
+  const vil = new THREE.Group(); vil.position.y = -.85; globe.add(vil);
+  const snowMat = new THREE.MeshStandardMaterial({ color: 0xf4f8ff, roughness: .9 });
+  const ground = new THREE.Mesh(new THREE.SphereGeometry(1.12, 48, 16, 0, Math.PI * 2, 0, 1.0), snowMat); ground.position.y = -1.1; vil.add(ground);
+  const winTex = canvasTex(THREE, 64, 64, (g) => { g.fillStyle = "#6b3b26"; g.fillRect(0, 0, 64, 64); g.fillStyle = "#ffcf6a"; g.fillRect(10, 16, 16, 18); g.fillRect(38, 16, 16, 18); g.fillRect(24, 40, 16, 24); });
+  const houseMat = new THREE.MeshStandardMaterial({ map: winTex, emissive: 0xffb050, emissiveMap: winTex, emissiveIntensity: .9, roughness: .8 }), roofMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .9 });
+  const house = (x, z, s, ry) => { const g = new THREE.Group(); const b = new THREE.Mesh(new THREE.BoxGeometry(.32, .26, .28), houseMat); b.position.y = .13; const roof = new THREE.Mesh(new THREE.ConeGeometry(.28, .2, 4), roofMat); roof.rotation.y = Math.PI / 4; roof.position.y = .36; g.add(b, roof); g.position.set(x, .02, z); g.scale.setScalar(s); g.rotation.y = ry; vil.add(g); };
+  house(0, 0, 1.2, .2); house(-.5, -.3, .8, -.4); house(.52, -.25, .85, .6); house(-.3, .38, .6, 1.1);
+  const treeMat = new THREE.MeshStandardMaterial({ color: 0x2f6a4a, roughness: .8 });
+  for (let i = 0; i < 9; i++){ let a = r() * 6.28; if (Math.abs(Math.sin(a) - 1) < .35) a += 1.4; const d = .55 + r() * .32, t = new THREE.Group(); [0, .1, .2].forEach((y, k) => { const c = new THREE.Mesh(new THREE.ConeGeometry(.13 - k * .03, .18, 10), treeMat); c.position.y = .1 + y; t.add(c); const cap = new THREE.Mesh(new THREE.ConeGeometry(.07 - k * .015, .06, 10), snowMat); cap.position.y = .18 + y; t.add(cap); }); t.position.set(Math.cos(a) * d, 0, Math.sin(a) * d * .8); t.scale.setScalar(.8 + r() * .6); vil.add(t); }
+  const lamp = glow(THREE, 0xffc070, .5, .9); lamp.position.set(0, .35, .25); vil.add(lamp);
+
+  /* snow inside (globe space) and outside */
+  const IN = points(THREE, 420, .045, 0xffffff, { blending: THREE.NormalBlending }); vil.add(IN.pts);
+  const iv = Array.from({ length: IN.n }, () => { const a = r() * 6.28, rr = Math.sqrt(r()) * 1.05; return [Math.cos(a) * rr, Math.sin(a) * rr, r(), r() * 6, .2 + r() * .5]; });
+  const OUT = points(THREE, 900, .05, 0xffffff, { blending: THREE.NormalBlending }); scene.add(OUT.pts);
+  const ov = Array.from({ length: OUT.n }, () => [(r() - .5) * 9, r() * 9, (r() - .5) * 9, r() * 6, .25 + r() * .5]);
+
+  const OPEN = 3.8;
+  function update({ t, p, idle, w, h }){
+    S.size(w, h);
+    const on = t >= 0, shake = on ? Math.sin(seg(t, 0, .9) * Math.PI) : 0, swirl = on ? seg(t, .25, 3.4) : 0, dive = on ? ease(seg(t, 1.6, OPEN)) : 0, Q = ease(p);
+    globe.rotation.z = Math.sin(t * 22) * .12 * shake; globe.position.x = Math.sin(t * 19) * .08 * shake;
+    for (let i = 0; i < IN.n; i++){ const v = iv[i], storm = Math.sin(swirl * Math.PI) * (1 - dive * .4); const a = Math.atan2(v[1], v[0]) + idle * (.2 + storm * 3) * v[4];
+      const rr = Math.hypot(v[0], v[1]) * (1 - storm * .3); const fall = (((v[2] - idle * .05 * v[4] - storm * 0) % 1) + 1) % 1;
+      const y = lerp(.03 + v[2] * .05, .06 + v[2] * 1.9, Math.max(storm, dive * .9)), lim = Math.sqrt(Math.max(0, 1.55 - (y - .9) * (y - .9))) * .9;
+      IN.pos[i * 3] = Math.cos(a) * rr * lim; IN.pos[i * 3 + 1] = y; IN.pos[i * 3 + 2] = Math.sin(a) * rr * lim; }
+    IN.g.attributes.position.needsUpdate = true;
+    for (let i = 0; i < OUT.n; i++){ const v = ov[i], y = ((v[1] - idle * v[4] * .8) % 9 + 9) % 9 - 3; OUT.pos[i * 3] = v[0] + Math.sin(idle + v[3]) * .2; OUT.pos[i * 3 + 1] = y; OUT.pos[i * 3 + 2] = v[2]; }
+    OUT.g.attributes.position.needsUpdate = true; OUT.pts.material.opacity = .25 + dive * .2;
+    
+    warm.intensity = 3 + Math.sin(idle * 3) * .4;
+    /* camera: in front of the globe → comes close, the globe rises to the top → circles it while scrolling */
+    const d = S.dist, ang = Q * 1.6 + Math.sin(idle * .15) * .08, rad = lerp(d, d * .66, dive) + Q * .8;
+    cam.position.set(Math.sin(ang) * rad, lerp(.35, .55, dive) + Q * .9, Math.cos(ang) * rad);
+    cam.lookAt(0, lerp(-.05, -1.15, dive) + Q * .2, 0);
+    R.render(scene, cam);
+  }
+  return { open: OPEN, update };
+}
+
+window.AMB_SCENE = { THREE, create: __scene }; window.dispatchEvent(new Event("amb-scene"));
+</script>
+</body>
+</html>

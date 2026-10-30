@@ -1,0 +1,93 @@
+/* მთვარის ტბა · ღამის ტბა, მთვარის ბილიკი წყალზე, ლოტოსი შუაში.
+   შეხებისას: კოკორი ფურცლებს შლის → შიგნიდან თბილი შუქი → ციცინათელები ამოფრინდებიან → კამერა ზემოთ.
+   ფურცვლისას: მთვარე ამოდის, კამერა ტბის თავზე ზემოთ და უკან მიდის. */
+import { stage, skyTex, glow, points, canvasTex, seg, ease, out, lerp, rng } from "./kit.js";
+
+export default async function(THREE, { canvas }){
+  const S = stage(THREE, canvas, { fov: 42, exposure: 1.08, fitW: 4.4, fitH: 5.4 }), { R, scene, cam } = S, r = rng(11);
+  scene.background = skyTex(THREE, [[0, "#04051A"], [.42, "#12164A"], [.7, "#2A2463"], [.86, "#4B3270"], [1, "#6A3F72"]]);
+  scene.fog = new THREE.Fog(0x1a1a4a, 22, 75);
+  scene.add(new THREE.HemisphereLight(0x8fa4ff, 0x0b0a1e, .55));
+  const moonLight = new THREE.DirectionalLight(0xcad6ff, 1.3); moonLight.position.set(0, 8, -20); scene.add(moonLight);
+  const front = new THREE.DirectionalLight(0xffd9ec, 1.1); front.position.set(1, 3, 9); scene.add(front);
+  const warm = new THREE.PointLight(0xffc98a, 0, 7, 1.6); warm.position.set(0, .9, 0); scene.add(warm);
+
+  /* stars */
+  const stars = points(THREE, 1100, .22, 0xffffff, { opacity: .9, sizeAttenuation: true });
+  for (let i = 0; i < stars.n; i++){ const a = r() * Math.PI * 2, e = .06 + r() * 1.3, R0 = 90; stars.pos[i * 3] = Math.cos(a) * Math.cos(e) * R0; stars.pos[i * 3 + 1] = Math.sin(e) * R0; stars.pos[i * 3 + 2] = Math.sin(a) * Math.cos(e) * R0 - 20; }
+  stars.pts.material.fog = false; scene.add(stars.pts);
+
+  /* the moon */
+  const moonTex = canvasTex(THREE, 512, 512, (g, w) => { g.fillStyle = "#f4f0e2"; g.fillRect(0, 0, w, w); const rr = rng(4);
+    for (let i = 0; i < 70; i++){ const x = rr() * w, y = rr() * w, s = 6 + rr() * 46, gr = g.createRadialGradient(x, y, 0, x, y, s); gr.addColorStop(0, "rgba(150,145,140,.42)"); gr.addColorStop(1, "rgba(150,145,140,0)"); g.fillStyle = gr; g.fillRect(x - s, y - s, s * 2, s * 2); } });
+  const moon = new THREE.Mesh(new THREE.SphereGeometry(2.4, 48, 32), new THREE.MeshBasicMaterial({ map: moonTex, fog: false })); scene.add(moon);
+  const halo1 = glow(THREE, 0xdfe6ff, 11, .45), halo2 = glow(THREE, 0x8a96ff, 26, .2); halo1.material.fog = halo2.material.fog = false; scene.add(halo1, halo2);
+
+  /* water: waves, a glittering moon path and the lotus' warm reflection */
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(240, 240, 1, 1), new THREE.ShaderMaterial({
+    uniforms: { uT: { value: 0 }, uMoonA: { value: 1 }, uGlow: { value: 0 }, uFog: { value: new THREE.Color(0x1a1a4a) } },
+    vertexShader: `varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+    fragmentShader: `uniform float uT, uMoonA, uGlow; uniform vec3 uFog; varying vec3 vW;
+      void main(){
+        float r = sin(vW.x * 1.7 + uT * 1.3) * .5 + sin(vW.z * 2.6 - uT * 1.1) * .5 + sin((vW.x + vW.z) * 5.3 + uT * 2.2) * .3 + sin((vW.x - vW.z) * 9.1 - uT * 2.7) * .15;
+        float far = max(0., -vW.z);
+        float streak = exp(-pow(vW.x / (.25 + far * .055), 2.)) * smoothstep(9., -2., vW.z) * smoothstep(-48., -30., vW.z) + exp(-pow(vW.x / (.25 + far * .055), 2.)) * smoothstep(-30., -6., vW.z);
+        float glit = pow(max(0., r * .5 + .5), 5.);
+        vec3 deep = mix(vec3(.004, .005, .02), vec3(.012, .014, .05), smoothstep(-70., 6., vW.z));
+        vec3 col = deep + vec3(.55, .6, .85) * streak * (.05 + .9 * glit) * uMoonA * (.3 + .7 * smoothstep(4., -12., vW.z));
+        col += vec3(1., .72, .38) * exp(-length(vW.xz) * 1.1) * uGlow * (.6 + .6 * glit);
+        float d = length(vW - cameraPosition); col = mix(col, uFog * .35, smoothstep(30., 90., d));
+        gl_FragColor = vec4(col, 1.);
+        #include <colorspace_fragment>
+      }` }));
+  water.rotation.x = -Math.PI / 2; scene.add(water);
+
+  /* lily pads */
+  const padMat = new THREE.MeshStandardMaterial({ color: 0x163828, roughness: .92, metalness: 0, side: THREE.DoubleSide });
+  const pads = []; for (let i = 0; i < 11; i++){ const a = r() * Math.PI * 2, d = 1.7 + r() * 3.6, s = .45 + r() * .5;
+    const m = new THREE.Mesh(new THREE.CircleGeometry(1, 40, .3, Math.PI * 2 - .6), padMat); m.rotation.x = -Math.PI / 2; m.rotation.z = r() * 6; m.scale.setScalar(s); m.position.set(Math.cos(a) * d, .02, Math.sin(a) * d * .8); scene.add(m); pads.push({ m, ph: r() * 6 }); }
+
+  /* the lotus: three rings of cupped petals coloured from rose to pearl */
+  const ps = new THREE.Shape(); ps.moveTo(0, 0); ps.bezierCurveTo(.34, .22, .38, .86, 0, 1.3); ps.bezierCurveTo(-.38, .86, -.34, .22, 0, 0);
+  const pg = new THREE.ShapeGeometry(ps, 28), pp = pg.attributes.position, cols = new Float32Array(pp.count * 3);
+  for (let i = 0; i < pp.count; i++){ const x = pp.getX(i), y = pp.getY(i); pp.setZ(i, .55 * x * x * 2.2 - .12 * y * y); const k = y / 1.3; cols[i * 3] = lerp(.86, 1, k); cols[i * 3 + 1] = lerp(.42, .93, k); cols[i * 3 + 2] = lerp(.6, .96, k); }
+  pg.setAttribute("color", new THREE.BufferAttribute(cols, 3)); pg.computeVertexNormals();
+  const petalMat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: .45, sheen: .8, sheenColor: new THREE.Color(0xffe0f0), side: THREE.DoubleSide, emissive: 0x5a2448, emissiveIntensity: .45 });
+  const lotus = new THREE.Group(); lotus.position.y = .05; scene.add(lotus);
+  const rings = [[9, 1, 1.28, 0], [9, .8, .92, Math.PI / 9], [7, .6, .52, .2]].map(([n, sc, open, ph], ri) => {
+    const list = []; for (let i = 0; i < n; i++){ const pivot = new THREE.Group(); pivot.rotation.y = ph + i / n * Math.PI * 2; const m = new THREE.Mesh(pg, petalMat); m.scale.setScalar(sc); pivot.add(m); lotus.add(pivot); list.push(m); }
+    return { list, open, ri }; });
+  const seedMat = new THREE.MeshStandardMaterial({ color: 0xffcf6a, emissive: 0xffa23a, emissiveIntensity: .0, roughness: .4 });
+  const pod = new THREE.Mesh(new THREE.CylinderGeometry(.2, .14, .16, 24), seedMat); pod.position.y = .32; lotus.add(pod);
+  const core = glow(THREE, 0xffc77a, .1, 0); core.position.y = .45; lotus.add(core);
+
+  /* fireflies */
+  const ff = points(THREE, 180, .13, 0xffd27a); ff.pts.material.fog = false; scene.add(ff.pts);
+  const fv = []; for (let i = 0; i < ff.n; i++) fv.push({ a: r() * 6.28, rad: 1 + r() * 7, h: .2 + r() * 1.4, sp: .2 + r() * .5, up: 2 + r() * 5, ph: r() * 6, dl: r() * .9 });
+
+  const OPEN = 3.6;
+  function update({ t, p, idle, w, h }){
+    S.size(w, h);
+    const on = t >= 0, bloom = on ? ease(seg(t, .3, 2.4)) : 0, fly = on ? seg(t, .7, 3.4) : 0;
+    rings.forEach(({ list, open, ri }) => { const k = on ? ease(seg(t, .25 + ri * .18, 2.2 + ri * .18)) : 0;
+      list.forEach((m, i) => { m.rotation.x = lerp(.14, open, k) + Math.sin(idle * 1.4 + i) * .015 * (1 - k); }); });
+    lotus.rotation.y = idle * .08; lotus.position.y = .05 + Math.sin(idle * 1.1) * .02;
+    warm.intensity = bloom * 7; seedMat.emissiveIntensity = bloom * 1.4; core.material.opacity = bloom * .9; core.scale.setScalar(.1 + bloom * 2.6 + Math.sin(idle * 3) * .1 * bloom);
+    water.material.uniforms.uT.value = idle; water.material.uniforms.uGlow.value = bloom * .7;
+    pads.forEach(o => { o.m.position.y = .02 + Math.sin(idle * .9 + o.ph) * .015; });
+    for (let i = 0; i < ff.n; i++){ const v = fv[i], a = v.a + idle * v.sp, k = Math.max(0, fly - v.dl * .3);
+      const lx = Math.cos(a) * v.rad, lz = Math.sin(a) * v.rad * .7 - 1, ly = v.h + Math.sin(idle * 1.7 + v.ph) * .25;
+      const bx = Math.cos(a * 2) * .3 * (1 - k), bz = Math.sin(a * 2) * .3 * (1 - k);
+      const born = on ? out(k) : 0; ff.pos[i * 3] = lerp(bx, lx, born); ff.pos[i * 3 + 1] = lerp(.5, ly + v.up * .25, born) * (on ? 1 : 0) + (on ? 0 : ly * .6); ff.pos[i * 3 + 2] = lerp(bz, lz, born);
+      if (!on){ ff.pos[i * 3] = lx * 1.2; ff.pos[i * 3 + 2] = lz - 2; } }
+    ff.g.attributes.position.needsUpdate = true; ff.pts.material.opacity = (on ? .4 + .6 * bloom : .45) * (.75 + Math.sin(idle * 5) * .25);
+    /* camera: close on the bud, then rise; scrolling lifts it over the lake while the moon climbs */
+    const d = S.dist, zoom = on ? Math.sin(seg(t, .6, 3.4) * Math.PI) * .22 : 0, lift = on ? ease(seg(t, 2.2, OPEN)) : 0, q = ease(p);
+    cam.position.set(Math.sin(idle * .12) * .25, lerp(1.25, 1.9, lift) + q * 3.2, d * (1 - zoom) + lift * .8 + q * 7);
+    cam.lookAt(0, lerp(.55, -.9, lift) + q * 3.6, -q * 18);
+    moon.position.set(0, 3.2 + lift * 1.2 + q * 7, -42); halo1.position.copy(moon.position); halo2.position.copy(moon.position);
+    halo1.material.opacity = .45 + Math.sin(idle * .8) * .05;
+    R.render(scene, cam);
+  }
+  return { open: OPEN, update };
+}
