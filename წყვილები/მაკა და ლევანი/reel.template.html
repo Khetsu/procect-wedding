@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=540,initial-scale=1">
+<title>REEL · მაკა და ლევანი</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+Georgian:wght@200;300;400&family=Noto+Sans+Georgian:wght@300;400&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* Instagram Reel 9:16. Designed at 540x960, recorded at 2x (1080x1920).
+   Safe zones: keep the main content between y=130 and y=770. */
+html,body{margin:0;width:540px;height:960px;overflow:hidden;background:#FBF7EE}
+body::before{opacity:.6}
+#stage{position:absolute;inset:0;z-index:5}
+.rs{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 36px 200px;opacity:0;transition:opacity 1s ease}
+.rs.on{opacity:1}
+.rs .framebox{position:absolute;left:22px;right:22px;top:92px;bottom:150px;border:1px solid var(--line);border-radius:4px;pointer-events:none}
+.rs .framebox::after{content:"";position:absolute;inset:6px;border:1px solid rgba(191,155,87,.22)}
+.rs .framebox .c{position:absolute;width:64px;height:64px;color:var(--gold)}
+.rs .framebox .c.tl{left:-1px;top:-1px}.rs .framebox .c.tr{right:-1px;top:-1px;transform:scaleX(-1)}.rs .framebox .c.bl{left:-1px;bottom:-1px;transform:scaleY(-1)}.rs .framebox .c.br{right:-1px;bottom:-1px;transform:scale(-1)}
+.pop{opacity:0}
+.on .pop{animation:rise-in 1.2s var(--ease) forwards;animation-delay:calc(var(--d,0) * 1s)}
+.arch{width:230px;height:300px;border-radius:999px 999px 14px 14px;overflow:hidden;outline:1px solid var(--gold);outline-offset:8px;box-shadow:0 26px 40px -18px rgba(110,80,35,.5);position:relative}
+.arch.inv{border-radius:14px 14px 999px 999px}
+.arch .photo{position:absolute;inset:0}
+.arch .photo img{animation:kenburns 14s ease-in-out infinite alternate}
+.r-eyebrow{font-family:var(--geo);font-weight:300;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-d);margin-bottom:22px}
+.r-script{font-family:var(--script);font-size:74px;line-height:1.15;white-space:nowrap;margin-top:22px}
+.on .r-script.hand{-webkit-mask-image:linear-gradient(90deg,#000 45%,transparent 55%);mask-image:linear-gradient(90deg,#000 45%,transparent 55%);-webkit-mask-size:260% 100%;mask-size:260% 100%;-webkit-mask-position:100% 0;mask-position:100% 0;animation:foil 7s linear infinite,write 2.6s cubic-bezier(.5,0,.3,1) .6s forwards}
+.r-geo{font-family:var(--geo);font-weight:200;font-size:19px;letter-spacing:.38em;text-transform:uppercase;margin-top:6px}
+.r-date{display:flex;align-items:center;gap:18px;margin-top:20px}
+.r-date .m,.r-date .y{font-family:var(--geo);font-weight:300;font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+.r-date .d{font-family:var(--serif);font-weight:300;font-size:70px;line-height:1;padding:0 18px;border-inline:1px solid var(--line)}
+.r-where{margin-top:14px;font-family:var(--geo);font-weight:300;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-d)}
+/* story slides */
+.slides{position:absolute;inset:0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:140px 36px 200px;opacity:0;transform:scale(1.04);transition:opacity .9s ease,transform 1.6s var(--ease)}
+.slide.on{opacity:1;transform:none}
+.slide .yr{font-family:var(--serif);font-weight:300;font-size:64px;line-height:1;margin-top:26px}
+.slide .ssn{font-family:var(--script);font-size:32px;color:var(--gold-d);line-height:1.2}
+.slide h3{margin:8px 0 0;font-family:var(--geo);font-weight:400;font-size:19px;letter-spacing:.06em;line-height:1.5}
+.s-head{position:absolute;top:122px;left:0;right:0;font-family:var(--script);font-size:40px;line-height:1}
+/* schedule */
+.r-title{font-family:var(--script);font-size:56px;line-height:1.1}
+.r-h2{font-family:var(--geo);font-weight:300;font-size:22px;letter-spacing:.14em;text-transform:uppercase;margin:2px 0 6px}
+.r-list{list-style:none;padding:0;margin:20px 0 0;width:100%;display:flex;flex-direction:column;gap:20px}
+.r-list li{display:grid;grid-template-columns:78px 50px 1fr;gap:14px;align-items:center;text-align:left}
+.r-list .tm{text-align:right;font-size:28px;line-height:1}
+.r-list .ic{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--gold);color:var(--gold-d);background:var(--ivory);box-shadow:0 0 0 4px var(--ivory),0 0 0 5px rgba(191,155,87,.3)}
+.r-list .ic svg{width:24px;height:24px}
+.r-list h4{margin:0;font-family:var(--geo);font-weight:400;font-size:17px;letter-spacing:.05em}
+.r-toast{font-style:italic;font-size:22px;line-height:1.5;max-width:380px;margin:10px 0 6px}
+.r-sign{font-family:var(--script);font-size:68px;line-height:1.2;white-space:nowrap;margin-top:22px}
+.r-when{font-size:17px;letter-spacing:.3em;color:var(--gold-d);margin-top:2px}
+.r-pill{margin-top:28px;display:inline-flex;align-items:center;gap:10px;padding:12px 26px;border-radius:99px;background:linear-gradient(120deg,#C7A664,#E6D09A 50%,#B8924A);color:#4A3A1B;font-family:var(--geo);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 10px 22px -10px rgba(148,116,58,.7)}
+.r-pill svg{width:18px;height:18px}
+.r-flourish{width:200px;height:24px;color:var(--gold);margin:10px 0}
+/* gate inside the reel keeps its own full-bleed look */
+.gate{position:absolute}
+#fade-end{position:absolute;inset:0;background:#FBF7EE;opacity:0;z-index:50;transition:opacity 1.2s ease;pointer-events:none}
+#fade-end.on{opacity:1}
+#start{position:absolute;inset:0;z-index:99;display:grid;place-items:center;background:rgba(251,247,238,.9);font-family:var(--geo);color:var(--gold-d);letter-spacing:.2em;cursor:pointer}
+</style>
+</head>
+<body>
+<!--DEFS-->
+<div class="glitter" id="page-glitter" aria-hidden="true" style="position:absolute"></div>
+<div class="petals" id="petals" aria-hidden="true" style="position:absolute"></div>
+
+<!--GATE-->
+
+<div id="stage">
+  <!-- scene 1: hero -->
+  <section class="rs" id="s1">
+    <div class="framebox"><svg class="c tl"><use href="#corner"/></svg><svg class="c tr"><use href="#corner"/></svg><svg class="c bl"><use href="#corner"/></svg><svg class="c br"><use href="#corner"/></svg></div>
+    <div class="r-eyebrow pop" style="--d:.2">გეპატიჟებით ჩვენს ქორწილში</div>
+    <div class="arch pop" id="hero-arch" style="--d:.5"></div>
+    <div class="r-script hand foil" id="r-names"></div>
+    <div class="r-geo pop" style="--d:2.2">მაკა · ლევანი</div>
+    <div class="r-date pop" id="r-date" style="--d:2.7"></div>
+    <div class="r-where pop" style="--d:3.2">შაბათი · თბილისი</div>
+  </section>
+  <!-- scene 2: story -->
+  <section class="rs" id="s2" style="padding:0">
+    <div class="framebox"><svg class="c tl"><use href="#corner"/></svg><svg class="c tr"><use href="#corner"/></svg><svg class="c bl"><use href="#corner"/></svg><svg class="c br"><use href="#corner"/></svg></div>
+    <div class="s-head foil">Our love story</div>
+    <div class="slides" id="slides"></div>
+  </section>
+  <!-- scene 3: schedule -->
+  <section class="rs" id="s3">
+    <div class="framebox"><svg class="c tl"><use href="#corner"/></svg><svg class="c tr"><use href="#corner"/></svg><svg class="c bl"><use href="#corner"/></svg><svg class="c br"><use href="#corner"/></svg></div>
+    <div class="r-title foil pop" style="--d:.1">Our day</div>
+    <div class="r-h2 pop" style="--d:.3">დღის განრიგი</div>
+    <svg class="r-flourish pop" style="--d:.5"><use href="#flourish"/></svg>
+    <ul class="r-list" id="r-list"></ul>
+  </section>
+  <!-- scene 4: finale -->
+  <section class="rs" id="s4">
+    <div class="framebox"><svg class="c tl"><use href="#corner"/></svg><svg class="c tr"><use href="#corner"/></svg><svg class="c bl"><use href="#corner"/></svg><svg class="c br"><use href="#corner"/></svg></div>
+    <div class="r-title foil pop" style="--d:.1">With love</div>
+    <svg class="r-flourish pop" style="--d:.4"><use href="#flourish"/></svg>
+    <p class="r-toast pop" style="--d:.7" id="r-toast"></p>
+    <div class="r-sign foil pop" style="--d:1.3" id="r-sign"></div>
+    <div class="r-when pop" style="--d:1.7" id="r-when"></div>
+    <div class="r-pill pop" style="--d:2.4"><svg><use href="#heart"/></svg>დასწრების დადასტურება · ბმული პროფილში</div>
+  </section>
+</div>
+<div id="fade-end"></div>
+<div id="start">შეეხე დასაწყებად</div>
+
+<script src="js/config.js"></script>
+<script src="js/music.js"></script>
+<script>
+(function(){
+"use strict";
+const C = window.CONFIG, $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const months = ["იანვარი","თებერვალი","მარტი","აპრილი","მაისი","ივნისი","ივლისი","აგვისტო","სექტემბერი","ოქტომბერი","ნოემბერი","დეკემბერი"];
+const [Y, M, D] = C.date.split("-").map(Number);
+const names = C.brideEn + " & " + C.groomEn;
+
+function photo(src){
+  const d = document.createElement("div"); d.className = "photo has";
+  const img = new Image();
+  img.onerror = () => { if (!img.dataset.fb){ img.dataset.fb = "1"; img.src = "images/art/" + src.split("/").pop().replace(/\.\w+$/, "") + ".svg"; } };
+  img.src = src; d.appendChild(img); return d;
+}
+/* fill content */
+$("hero-arch").appendChild(photo(C.heroPhoto));
+$("r-names").textContent = names;
+$("r-date").innerHTML = '<span class="m">' + months[M - 1] + '</span><span class="d foil">' + pad(D) + '</span><span class="y">' + Y + '</span>';
+$("r-toast").textContent = C.toast;
+$("r-sign").textContent = names;
+$("r-when").textContent = pad(D) + " · " + pad(M) + " · " + Y;
+[0, 1, 2, 3].forEach(i => {
+  const s = C.story[i], el = document.createElement("div");
+  el.className = "slide";
+  el.innerHTML = '<div class="arch' + (i % 2 ? " inv" : "") + '"></div><div class="yr foil"></div><div class="ssn"></div><h3></h3>';
+  el.querySelector(".arch").appendChild(photo(s.photo));
+  el.querySelector(".yr").textContent = s.year; el.querySelector(".ssn").textContent = s.season; el.querySelector("h3").textContent = s.title;
+  $("slides").appendChild(el);
+});
+C.events.forEach((ev, i) => {
+  const li = document.createElement("li"); li.className = "pop"; li.style.setProperty("--d", (.8 + i * .55).toFixed(2));
+  li.innerHTML = '<span class="tm"></span><span class="ic"><svg><use href="#i-' + ev.icon + '"/></svg></span><h4></h4>';
+  li.querySelector(".tm").textContent = ev.time; li.querySelector("h4").textContent = ev.title;
+  $("r-list").appendChild(li);
+});
+
+/* envelope texts (no i18n script on this page) */
+const T = { monogram: C.monogram, latinNames: names, eyebrowShort: "საქორწილო მოსაწვევი", dots: pad(D) + " · " + pad(M) + " · " + Y },
+      I = { gateTitle: "გახსენით კონვერტი და ნახეთ მოსაწვევი", gateHint: "შეეხეთ ბეჭედს, ჩაირთვება მუსიკა" };
+document.querySelectorAll("[data-t]").forEach(el => { el.textContent = T[el.dataset.t] || ""; });
+document.querySelectorAll("[data-i18n]").forEach(el => { if (I[el.dataset.i18n]) el.textContent = I[el.dataset.i18n]; });
+
+/* ambience */
+function glitter(box, n){ for (let i = 0; i < n; i++){ const s = document.createElement("span"), k = .5 + Math.random(); s.style.left = Math.random()*100 + "%"; s.style.top = Math.random()*100 + "%"; s.style.width = s.style.height = (2 + Math.random()*4)*k + "px"; const dur = 4 + Math.random()*6; s.style.animationDuration = dur + "s," + dur*1.7 + "s"; s.style.animationDelay = -Math.random()*dur + "s"; box.appendChild(s); } }
+function petals(n){ const box = $("petals"), tones = [["#FFFFFF","#F2DCD6"],["#F6D9D2","#E2AFA6"],["#FFF4E6","#EBD2B0"]]; for (let i = 0; i < n; i++){ const p = document.createElement("span"), c = tones[i % 3], k = .6 + Math.random()*.9; p.className = "petal"; p.innerHTML = '<svg viewBox="0 0 20 26"><defs><linearGradient id="pg'+i+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c[0]+'"/><stop offset="1" stop-color="'+c[1]+'"/></linearGradient></defs><path d="M10 1C17 6 19 16 10 25C1 16 3 6 10 1Z" fill="url(#pg'+i+')" stroke="rgba(180,140,90,.25)" stroke-width=".5"/></svg>'; const dur = 11 + Math.random()*9; p.style.left = Math.random()*100 + "%"; p.style.width = 16*k + "px"; p.style.height = 21*k + "px"; p.style.setProperty("--sway", (30 + Math.random()*60) + "px"); p.style.animationDuration = dur + "s," + (3 + Math.random()*3) + "s"; p.style.animationDelay = -Math.random()*dur + "s," + -Math.random()*4 + "s"; box.appendChild(p); } }
+function burst(host, x, y, n){ for (let i = 0; i < n; i++){ const s = document.createElement("span"); s.className = "spark"; if (i % 4 === 0){ s.classList.add("h"); s.textContent = "♥"; } const a = Math.random()*Math.PI*2, d = 50 + Math.random()*140; s.style.left = (x-6) + "px"; s.style.top = (y-6) + "px"; s.style.setProperty("--x", Math.cos(a)*d + "px"); s.style.setProperty("--y", Math.sin(a)*d + "px"); s.style.setProperty("--s", (.5 + Math.random()*1.1).toFixed(2)); s.style.animation = "burst " + (.9 + Math.random()*.9) + "s cubic-bezier(.2,.7,.2,1) forwards"; host.appendChild(s); setTimeout(() => s.remove(), 1900); } }
+glitter($("gate-glitter"), 30); glitter($("page-glitter"), 22); petals(9);
+
+/* timeline, in seconds */
+const gate = $("gate");
+gate.hidden = false;
+function scene(id, on){ $(id).classList.toggle("on", on); }
+function play(){
+  const T = (t, fn) => setTimeout(fn, t * 1000);
+  if (location.search.indexOf("cap") < 0) { try { window.Music.start(); } catch(_) {} }
+  T(.9,  () => gate.classList.add("cracking"));
+  T(1.5, () => { gate.classList.add("broken"); const g = gate.getBoundingClientRect(), r = $("seal").getBoundingClientRect(); burst(gate, r.left - g.left + r.width/2, r.top - g.top + r.height/2, 38); });
+  T(1.95,() => gate.classList.add("flap-open"));
+  T(3.3, () => gate.classList.add("letter-out"));
+  T(5.6, () => { gate.classList.add("open"); scene("s1", true); });
+  T(6.9, () => setTimeout(() => gate.hidden = true, 1300));
+  T(12.4,() => { scene("s1", false); scene("s2", true); });
+  [0, 1, 2, 3].forEach(i => { T(12.6 + i * 2.8, () => { document.querySelectorAll(".slide").forEach((s, k) => s.classList.toggle("on", k === i)); }); });
+  T(24,  () => { scene("s2", false); document.querySelectorAll(".slide").forEach(s => s.classList.remove("on")); scene("s3", true); });
+  T(30,  () => { scene("s3", false); scene("s4", true); });
+  T(36.5,() => $("fade-end").classList.add("on"));
+  T(38,  () => window.dispatchEvent(new Event("reel-end")));
+}
+window.reel = { play };
+$("start").addEventListener("click", () => { $("start").remove(); play(); });
+if (/cap|auto/.test(location.search)) $("start").remove();
+if (location.search.indexOf("auto") >= 0) play();
+})();
+</script>
+<!--RECORDER-->
+</body>
+</html>
