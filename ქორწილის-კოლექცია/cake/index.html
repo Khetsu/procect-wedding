@@ -1,0 +1,169 @@
+<!doctype html>
+<!-- ამბავი · ქორწილის კოლექცია · თამარ &amp; ლევან. ტექსტები და ფერები: config.js · 3D სამყარო: scene.js (ჩაშენებულია ქვემოთ, build.cjs-ით) · ძრავი: amb.js/amb.css -->
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>თამარ &amp; ლევან · ამბავი</title>
+<meta name="description" content="სიყვარულით გიწვევთ ჩვენს ქორწილში — თამარ &amp; ლევან">
+<meta property="og:title" content="💌 თამარ &amp; ლევან">
+<meta property="og:description" content="თქვენ მიიღეთ მოსაწვევი">
+<meta name="theme-color" content="#100B08">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@300;400;500;600&family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&display=swap">
+<link rel="stylesheet" href="amb.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<script src="config.js"></script>
+<script src="music.js"></script>
+<script src="amb.js"></script>
+<script type="module">
+import * as THREE from "three";
+/* ამბავი 2 · სცენების საერთო ხელსაწყოები */
+const seg = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const out = t => 1 - Math.pow(1 - t, 3);
+const inq = t => t * t;
+const back = t => { const c1 = 1.6, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const lerp = (a, b, k) => a + (b - a) * k;
+function rng(seed = 1){ let s = seed >>> 0 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+
+/* renderer + camera that keeps a subject of width `fitW` inside a portrait screen */
+function stage(THREE, canvas, { fov = 40, exposure = 1, fitW = 4, fitH = 6, shadows = false } = {}){
+  const R = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+  R.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = exposure;
+  if (shadows){ R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap; }
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(fov, 1, .05, 600);
+  const st = { R, scene, cam, dist: 10, aspect: 1 };
+  st.render = () => R.render(scene, cam);
+  st.size = (w, h) => { if (st._w === w && st._h === h) return; st._w = w; st._h = h; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+    const tf = Math.tan(THREE.MathUtils.degToRad(fov / 2)); st.aspect = cam.aspect; st.dist = Math.max(fitH / (2 * tf), fitW / (2 * tf * cam.aspect)); };
+  return st;
+}
+function canvasTex(THREE, w, h, draw, srgb = true){ const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
+function skyTex(THREE, stops){ return canvasTex(THREE, 16, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); stops.forEach(([o, c]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(0, 0, w, h); }); }
+function dot(THREE, soft = .28){ return canvasTex(THREE, 64, 64, (g) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(soft, "rgba(255,255,255,.75)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }, false); }
+function glow(THREE, color, size, opacity = 1){ const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: dot(THREE, .18), color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending })); s.scale.setScalar(size); return s; }
+/* a cloud of soft points; returns { pts, pos, n } */
+function points(THREE, n, size, color, opts = {}){
+  const g = new THREE.BufferGeometry(), pos = new Float32Array(n * 3); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const m = new THREE.PointsMaterial({ size, color, map: dot(THREE), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, ...opts });
+  const pts = new THREE.Points(g, m); pts.frustumCulled = false;
+  return { pts, pos, n, g };
+}
+async function envMap(THREE, R, intensity = .04){ const { RoomEnvironment } = await import("https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/environments/RoomEnvironment.js"); return new THREE.PMREMGenerator(R).fromScene(new RoomEnvironment(), intensity).texture; }
+function flash(k){ const f = document.getElementById("flash"); if (f) f.style.opacity = String(k); }
+
+/* ---------- wedding collection: realism helpers ---------- */
+/* bloom post-processing (soft glow on bright highlights); replaces S.render */
+async function post(THREE, S, { strength = .55, radius = .6, threshold = .85 } = {}){
+  const B = "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/";
+  const [{ EffectComposer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }] = await Promise.all(["EffectComposer.js", "RenderPass.js", "UnrealBloomPass.js", "OutputPass.js"].map(f => import(B + f)));
+  const comp = new EffectComposer(S.R); comp.addPass(new RenderPass(S.scene, S.cam));
+  const bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), strength, radius, threshold); comp.addPass(bloom); comp.addPass(new OutputPass());
+  const size0 = S.size; S.size = (w, h) => { const ch = S._w !== w || S._h !== h; size0(w, h); if (ch){ comp.setPixelRatio(S.R.getPixelRatio()); comp.setSize(w, h); } };
+  S.render = () => comp.render(); S.bloom = bloom; return comp;
+}
+/* out-of-focus lights in the background (lens bokeh) */
+function bokehTex(THREE){ return canvasTex(THREE, 128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,.5)"); gr.addColorStop(.72, "rgba(255,255,255,.58)"); gr.addColorStop(.87, "rgba(255,255,255,.9)"); gr.addColorStop(.95, "rgba(255,255,255,.3)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }, false); }
+function bokeh(THREE, scene, n, o = {}){
+  const r = rng(o.seed || 3), tex = bokehTex(THREE), cols = o.colors || [0xffd9a0, 0xffe9c8, 0xfff4e0], list = [];
+  const L = (a, k) => lerp(a[0], a[1], k);
+  for (let i = 0; i < n; i++){ const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color: cols[i % cols.length], transparent: true, opacity: L(o.op || [.08, .3], r()), depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+    s.scale.setScalar(L(o.size || [.5, 2], r())); s.position.set(L(o.x || [-12, 12], r()), L(o.y || [-1, 9], r()), L(o.z || [-8, -26], r())); s.userData.o = s.material.opacity; s.userData.ph = r() * 6; scene.add(s); list.push(s); }
+  return list;
+}
+/* a garden rose made of curled petals in a golden-angle spiral; ~1 unit tall */
+function rose(THREE, o = {}){
+  const n = o.petals || 24, base = new THREE.Color(o.base || 0xf2cfc8), tip = new THREE.Color(o.color || 0xfffaf3), r = rng(o.seed || 1);
+  const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.bezierCurveTo(.42, .12, .55, .7, .3, 1); sh.bezierCurveTo(.15, 1.12, -.15, 1.12, -.3, 1); sh.bezierCurveTo(-.55, .7, -.42, .12, 0, 0);
+  const g = new THREE.Group(), mat = o.mat || new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: .55, sheen: 1, sheenColor: new THREE.Color(0xffffff), sheenRoughness: .45, side: THREE.DoubleSide });
+  for (let i = 0; i < n; i++){ const k = i / (n - 1), geo = new THREE.ShapeGeometry(sh, 10), p = geo.attributes.position, cols = new Float32Array(p.count * 3), c = new THREE.Color();
+    const cup = lerp(1.7, .7, k), curl = lerp(0, .55, k * k * k);
+    for (let j = 0; j < p.count; j++){ const x = p.getX(j), y = p.getY(j); p.setZ(j, -cup * x * x + curl * y * y * y); c.copy(base).lerp(tip, Math.min(1, y * 1.15 + k * .35)); cols[j * 3] = c.r; cols[j * 3 + 1] = c.g; cols[j * 3 + 2] = c.b; }
+    geo.setAttribute("color", new THREE.BufferAttribute(cols, 3)); geo.computeVertexNormals();
+    const m = new THREE.Mesh(geo, mat), s = lerp(.28, 1, Math.pow(k, .7)); m.scale.set(s * lerp(.75, 1.1, k), s, s); m.position.z = lerp(.02, .1, k); m.rotation.x = lerp(.05, .92, Math.pow(k, 1.6)) + (r() - .5) * .08;
+    m.castShadow = !!o.shadow; const pv = new THREE.Group(); pv.rotation.y = i * 2.39996 + r() * .25; pv.add(m); g.add(pv); }
+  return g;
+}
+/* a canvas text texture with transparent background */
+function textTex(THREE, w, h, draw){ return canvasTex(THREE, w, h, (g) => { g.clearRect(0, 0, w, h); draw(g, w, h); }); }
+
+/* საქორწილო ტორტი · სამსართულიანი თეთრი ტორტი მარგალიტებით და შაქრის ვარდების კასკადით, ოქროს სადგამზე; თავზე — ოქროს ინიციალები.
+   შეხებისას: დარბაზის შუქი ქრება → ორი ბენგალური ცეცხლი ინთება და ოქროს ნაპერწკლებს ისვრის → ტორტი ნელა ტრიალებს → კამერა ზემოთ ადის.
+   ფურცვლისას: კამერა ტორტს ირგვლივ უვლის. */
+
+const __scene = async function(THREE, { canvas, C }){
+  await Promise.race([Promise.all(['400 80px "Great Vibes"', '500 80px "Noto Serif Georgian"'].map(f => document.fonts.load(f, "A&ა"))), new Promise(r => setTimeout(r, 2500))]);
+  const S = stage(THREE, canvas, { fov: 36, exposure: .9, fitW: 2.9, fitH: 3.6, shadows: true }), { R, scene, cam } = S, r = rng(14);
+  scene.background = skyTex(THREE, [[0, "#140E0A"], [.55, "#2A1D14"], [1, "#3E2B1E"]]);
+  scene.environment = await envMap(THREE, R, .04); scene.environmentIntensity = .35;
+  await post(THREE, S, { strength: .8, radius: .45, threshold: 1.0 });
+  const bk = bokeh(THREE, scene, 70, { colors: [0xffcf8a, 0xffe6bc, 0xfff3dc, 0xffb070], x: [-8, 8], y: [-1, 7], z: [-6, -18], size: [.4, 1.5], op: [.05, .18], seed: 41 });
+  const hemi = new THREE.HemisphereLight(0xfff0dc, 0x2a1a10, .2); scene.add(hemi);
+  const key = new THREE.SpotLight(0xfff2e0, 9, 16, .45, .7, 1.2); key.position.set(2.5, 6, 4); key.target.position.set(0, 1.1, 0); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 6; key.shadow.bias = -.0004; scene.add(key, key.target);
+  const rim = new THREE.DirectionalLight(0xffc88a, .9); rim.position.set(-3, 3, -4); scene.add(rim);
+  const sparkL = new THREE.PointLight(0xffc060, 0, 5, 1.5); scene.add(sparkL);
+
+  /* table with linen */
+  const linen = new THREE.MeshStandardMaterial({ color: 0xc8bba8, roughness: .92 });
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, .05, 96), linen); top.position.y = -.025; top.receiveShadow = true; scene.add(top);
+  const drape = new THREE.Mesh(new THREE.CylinderGeometry(2.42, 2.6, 1.8, 96, 1, true), linen); drape.position.y = -.92; scene.add(drape);
+  /* gold cake stand */
+  const goldM = new THREE.MeshStandardMaterial({ color: 0xd4ae5e, metalness: 1, roughness: .28 });
+  const stand = new THREE.Mesh(new THREE.LatheGeometry([[0, 0], [.42, 0], [.44, .03], [.12, .08], [.08, .2], [.1, .24], [1.12, .26], [1.14, .3], [0, .3]].map(([x, y]) => new THREE.Vector2(x, y)), 72), goldM); stand.castShadow = stand.receiveShadow = true; scene.add(stand);
+
+  /* the cake */
+  const cake = new THREE.Group(); cake.position.y = .3; scene.add(cake);
+  const fondant = new THREE.MeshPhysicalMaterial({ color: 0xd9d0c2, roughness: .6, sheen: .3, sheenColor: new THREE.Color(0xfff6ea), clearcoat: .05, envMapIntensity: .6 });
+  const pearlM = new THREE.MeshPhysicalMaterial({ color: 0xe6dfd2, roughness: .22, iridescence: .7, iridescenceIOR: 1.4, clearcoat: 1, envMapIntensity: .9 });
+  const tiers = [[.95, .55], [.72, .5], [.5, .45]]; let y = 0; const tierTop = [];
+  tiers.forEach(([rad, h], i) => { const prof = [[0, 0], [rad, 0], [rad, h - .045], [rad - .012, h - .015], [rad - .045, h], [0, h]].map(([x, yy]) => new THREE.Vector2(x, yy));
+    const m = new THREE.Mesh(new THREE.LatheGeometry(prof, 96), fondant); m.position.y = y; m.castShadow = m.receiveShadow = true; cake.add(m);
+    const n = Math.floor(Math.PI * 2 * rad / .055), pearls = new THREE.InstancedMesh(new THREE.SphereGeometry(.026, 14, 10), pearlM, n), M = new THREE.Matrix4();
+    for (let k = 0; k < n; k++){ const a = k / n * Math.PI * 2; M.makeTranslation(Math.cos(a) * (rad + .012), y + .026, Math.sin(a) * (rad + .012)); pearls.setMatrixAt(k, M); } pearls.castShadow = true; cake.add(pearls);
+    if (i === 1){ const band = new THREE.Mesh(new THREE.CylinderGeometry(rad + .004, rad + .004, .07, 96, 1, true), new THREE.MeshStandardMaterial({ color: 0xd8b56a, metalness: 1, roughness: .35 })); band.position.y = y + h * .55; cake.add(band); }
+    y += h; tierTop.push(y); });
+  /* a cascade of sugar roses */
+  const roseMat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: .75, sheen: .4, sheenColor: new THREE.Color(0xffffff), side: THREE.DoubleSide });
+  const leafM = new THREE.MeshStandardMaterial({ color: 0x9fb39a, roughness: .7, side: THREE.DoubleSide }), leafG = new THREE.CircleGeometry(.04, 12);
+  for (let i = 0; i < 14; i++){ const k = i / 13, a = -.6 + k * 2.4, ti = k < .3 ? 2 : k < .62 ? 1 : 0, rad = tiers[ti][0], yy = ti === 0 ? lerp(.15, .5, (1 - (k - .62) / .38)) : tiers.slice(0, ti).reduce((s, t) => s + t[1], 0) + tiers[ti][1] * (.25 + r() * .6);
+    const rs = rose(THREE, { seed: 70 + i, color: i % 3 ? 0xd9d0c4 : 0xdcc4bb, base: i % 2 ? 0xc0968c : 0xc8b09a, mat: roseMat, shadow: true }); rs.scale.setScalar(.11 + r() * .04);
+    const px = Math.cos(a) * (rad + .02), pz = Math.sin(a) * (rad + .02); rs.position.set(px, yy, pz); rs.lookAt(px * 3, yy + .6, pz * 3); rs.rotateX(Math.PI / 2); cake.add(rs);
+    for (let j = 0; j < 2; j++){ const lf = new THREE.Mesh(leafG, leafM); lf.position.set(Math.cos(a + (j ? .14 : -.14)) * (rad + .03), yy - .04, Math.sin(a + (j ? .14 : -.14)) * (rad + .03)); lf.rotation.set(r() * 2, a, r()); lf.scale.set(1, 1.6, 1); cake.add(lf); } }
+  /* gold initials topper */
+  const ini = (C.a || "ა")[0] + " & " + ((C.b || "")[0] || "");
+  const tTex = textTex(THREE, 512, 256, (g, w, h) => { g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = "#fff"; g.font = '500 150px "Noto Serif Georgian"'; g.fillText((C.a || "ა")[0], w / 2 - 120, h / 2 + 10); g.fillText(((C.b || "")[0] || ""), w / 2 + 120, h / 2 + 10); g.font = '400 140px "Great Vibes"'; g.fillText("&", w / 2, h / 2 + 18); });
+  const topper = new THREE.Mesh(new THREE.PlaneGeometry(.9, .45), new THREE.MeshStandardMaterial({ color: 0xe0bc6c, metalness: 1, roughness: .25, alphaMap: tTex, transparent: true, alphaTest: .4, side: THREE.DoubleSide, emissive: 0x3a2808, emissiveIntensity: .3 }));
+  topper.position.y = y + .38; cake.add(topper);
+  [-.18, .18].forEach(x => { const st = new THREE.Mesh(new THREE.CylinderGeometry(.006, .006, .2, 6), goldM); st.position.set(x * 1.3, y + .1, 0); cake.add(st); });
+  /* sparklers */
+  const sticks = [[-.32, .1], [.3, -.12]].map(([x, z]) => { const s = new THREE.Mesh(new THREE.CylinderGeometry(.008, .008, .5, 6), new THREE.MeshStandardMaterial({ color: 0x777777, metalness: .8, roughness: .5 })); s.position.set(x, y + .25, z); cake.add(s); return new THREE.Vector3(x, y + .5, z); });
+  const SP = points(THREE, 1100, .07, 0xffe0a0); scene.add(SP.pts); const spv = Array.from({ length: SP.n }, (_, i) => { const a = r() * 6.28, e = r() * 1.5 - .2, s = .6 + r() * 1.4; return [i % 2, Math.cos(a) * Math.cos(e) * s, Math.sin(e) * s, Math.sin(a) * Math.cos(e) * s, r()]; });
+  const heads = sticks.map(() => { const g = glow(THREE, 0xfff0c0, .1, 0); scene.add(g); return g; });
+
+  const OPEN = 3.8, tmp = new THREE.Vector3();
+  function update({ t, p, idle, w, h }){
+    S.size(w, h);
+    const on = t >= 0, dim = on ? seg(t, 0, .6) * (1 - .5 * seg(t, 2.8, 3.8)) : 0, fire = on ? seg(t, .6, .9) : 0, Q = ease(p);
+    key.intensity = 9 * (1 - dim * .7); hemi.intensity = .2 * (1 - dim * .7); bk.forEach(b => { b.material.opacity = b.userData.o * (1 - dim * .5) * (.75 + .25 * Math.sin(idle * .7 + b.userData.ph)); });
+    cake.rotation.y = on ? (t - .2) * .22 + idle * 0 : Math.sin(idle * .2) * .05;
+    cake.updateMatrixWorld(); const wp = sticks.map(s => s.clone().applyMatrix4(cake.matrixWorld));
+    for (let i = 0; i < SP.n; i++){ const v = spv[i], src = wp[v[0]], k = ((idle * 1.3 + v[4]) % 1), e = k * .55;
+      SP.pos[i * 3] = src.x + v[1] * e; SP.pos[i * 3 + 1] = fire > 0 ? src.y + v[2] * e - k * k * .35 : -50; SP.pos[i * 3 + 2] = src.z + v[3] * e; }
+    SP.g.attributes.position.needsUpdate = true; SP.pts.material.opacity = fire;
+    heads.forEach((g, i) => { g.position.copy(wp[i]); g.material.opacity = fire; g.scale.setScalar((.18 + Math.abs(Math.sin(idle * 37 + i * 3)) * .06) * fire); });
+    sparkL.position.copy(wp[0]).add(wp[1]).multiplyScalar(.5); sparkL.intensity = fire * (5 + Math.abs(Math.sin(idle * 29)) * 1.5);
+    const d = S.dist, rise = on ? ease(seg(t, .8, OPEN)) : 0, a = Q * 1.6 + Math.sin(idle * .12) * .05, rad = lerp(d, d * .78, rise) + Q * .5;
+    cam.position.set(Math.sin(a) * rad, lerp(1.05, 2.15, rise) + Q * .4, Math.cos(a) * rad);
+    cam.lookAt(0, lerp(1.0, 1.75, rise) - Q * .2, 0);
+    S.render();
+  }
+  return { open: OPEN, update };
+}
+
+window.AMB_SCENE = { THREE, create: __scene }; window.dispatchEvent(new Event("amb-scene"));
+</script>
+</body>
+</html>

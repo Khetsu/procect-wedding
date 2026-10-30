@@ -1,0 +1,169 @@
+<!doctype html>
+<!-- ამბავი · ქორწილის კოლექცია · მარიამი &amp; გიორგი. ტექსტები და ფერები: config.js · 3D სამყარო: scene.js (ჩაშენებულია ქვემოთ, build.cjs-ით) · ძრავი: amb.js/amb.css -->
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>მარიამი &amp; გიორგი · ამბავი</title>
+<meta name="description" content="სიყვარულით გიწვევთ ჩვენს ქორწილში — მარიამი &amp; გიორგი">
+<meta property="og:title" content="💌 მარიამი &amp; გიორგი">
+<meta property="og:description" content="თქვენ მიიღეთ მოსაწვევი">
+<meta name="theme-color" content="#2A2019">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@300;400;500;600&family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&display=swap">
+<link rel="stylesheet" href="amb.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<script src="config.js"></script>
+<script src="music.js"></script>
+<script src="amb.js"></script>
+<script type="module">
+import * as THREE from "three";
+/* ამბავი 2 · სცენების საერთო ხელსაწყოები */
+const seg = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const out = t => 1 - Math.pow(1 - t, 3);
+const inq = t => t * t;
+const back = t => { const c1 = 1.6, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const lerp = (a, b, k) => a + (b - a) * k;
+function rng(seed = 1){ let s = seed >>> 0 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+
+/* renderer + camera that keeps a subject of width `fitW` inside a portrait screen */
+function stage(THREE, canvas, { fov = 40, exposure = 1, fitW = 4, fitH = 6, shadows = false } = {}){
+  const R = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+  R.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = exposure;
+  if (shadows){ R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap; }
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(fov, 1, .05, 600);
+  const st = { R, scene, cam, dist: 10, aspect: 1 };
+  st.render = () => R.render(scene, cam);
+  st.size = (w, h) => { if (st._w === w && st._h === h) return; st._w = w; st._h = h; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+    const tf = Math.tan(THREE.MathUtils.degToRad(fov / 2)); st.aspect = cam.aspect; st.dist = Math.max(fitH / (2 * tf), fitW / (2 * tf * cam.aspect)); };
+  return st;
+}
+function canvasTex(THREE, w, h, draw, srgb = true){ const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
+function skyTex(THREE, stops){ return canvasTex(THREE, 16, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); stops.forEach(([o, c]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(0, 0, w, h); }); }
+function dot(THREE, soft = .28){ return canvasTex(THREE, 64, 64, (g) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(soft, "rgba(255,255,255,.75)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }, false); }
+function glow(THREE, color, size, opacity = 1){ const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: dot(THREE, .18), color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending })); s.scale.setScalar(size); return s; }
+/* a cloud of soft points; returns { pts, pos, n } */
+function points(THREE, n, size, color, opts = {}){
+  const g = new THREE.BufferGeometry(), pos = new Float32Array(n * 3); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const m = new THREE.PointsMaterial({ size, color, map: dot(THREE), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, ...opts });
+  const pts = new THREE.Points(g, m); pts.frustumCulled = false;
+  return { pts, pos, n, g };
+}
+async function envMap(THREE, R, intensity = .04){ const { RoomEnvironment } = await import("https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/environments/RoomEnvironment.js"); return new THREE.PMREMGenerator(R).fromScene(new RoomEnvironment(), intensity).texture; }
+function flash(k){ const f = document.getElementById("flash"); if (f) f.style.opacity = String(k); }
+
+/* ---------- wedding collection: realism helpers ---------- */
+/* bloom post-processing (soft glow on bright highlights); replaces S.render */
+async function post(THREE, S, { strength = .55, radius = .6, threshold = .85 } = {}){
+  const B = "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/";
+  const [{ EffectComposer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }] = await Promise.all(["EffectComposer.js", "RenderPass.js", "UnrealBloomPass.js", "OutputPass.js"].map(f => import(B + f)));
+  const comp = new EffectComposer(S.R); comp.addPass(new RenderPass(S.scene, S.cam));
+  const bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), strength, radius, threshold); comp.addPass(bloom); comp.addPass(new OutputPass());
+  const size0 = S.size; S.size = (w, h) => { const ch = S._w !== w || S._h !== h; size0(w, h); if (ch){ comp.setPixelRatio(S.R.getPixelRatio()); comp.setSize(w, h); } };
+  S.render = () => comp.render(); S.bloom = bloom; return comp;
+}
+/* out-of-focus lights in the background (lens bokeh) */
+function bokehTex(THREE){ return canvasTex(THREE, 128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,.5)"); gr.addColorStop(.72, "rgba(255,255,255,.58)"); gr.addColorStop(.87, "rgba(255,255,255,.9)"); gr.addColorStop(.95, "rgba(255,255,255,.3)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }, false); }
+function bokeh(THREE, scene, n, o = {}){
+  const r = rng(o.seed || 3), tex = bokehTex(THREE), cols = o.colors || [0xffd9a0, 0xffe9c8, 0xfff4e0], list = [];
+  const L = (a, k) => lerp(a[0], a[1], k);
+  for (let i = 0; i < n; i++){ const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color: cols[i % cols.length], transparent: true, opacity: L(o.op || [.08, .3], r()), depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+    s.scale.setScalar(L(o.size || [.5, 2], r())); s.position.set(L(o.x || [-12, 12], r()), L(o.y || [-1, 9], r()), L(o.z || [-8, -26], r())); s.userData.o = s.material.opacity; s.userData.ph = r() * 6; scene.add(s); list.push(s); }
+  return list;
+}
+/* a garden rose made of curled petals in a golden-angle spiral; ~1 unit tall */
+function rose(THREE, o = {}){
+  const n = o.petals || 24, base = new THREE.Color(o.base || 0xf2cfc8), tip = new THREE.Color(o.color || 0xfffaf3), r = rng(o.seed || 1);
+  const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.bezierCurveTo(.42, .12, .55, .7, .3, 1); sh.bezierCurveTo(.15, 1.12, -.15, 1.12, -.3, 1); sh.bezierCurveTo(-.55, .7, -.42, .12, 0, 0);
+  const g = new THREE.Group(), mat = o.mat || new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: .55, sheen: 1, sheenColor: new THREE.Color(0xffffff), sheenRoughness: .45, side: THREE.DoubleSide });
+  for (let i = 0; i < n; i++){ const k = i / (n - 1), geo = new THREE.ShapeGeometry(sh, 10), p = geo.attributes.position, cols = new Float32Array(p.count * 3), c = new THREE.Color();
+    const cup = lerp(1.7, .7, k), curl = lerp(0, .55, k * k * k);
+    for (let j = 0; j < p.count; j++){ const x = p.getX(j), y = p.getY(j); p.setZ(j, -cup * x * x + curl * y * y * y); c.copy(base).lerp(tip, Math.min(1, y * 1.15 + k * .35)); cols[j * 3] = c.r; cols[j * 3 + 1] = c.g; cols[j * 3 + 2] = c.b; }
+    geo.setAttribute("color", new THREE.BufferAttribute(cols, 3)); geo.computeVertexNormals();
+    const m = new THREE.Mesh(geo, mat), s = lerp(.28, 1, Math.pow(k, .7)); m.scale.set(s * lerp(.75, 1.1, k), s, s); m.position.z = lerp(.02, .1, k); m.rotation.x = lerp(.05, .92, Math.pow(k, 1.6)) + (r() - .5) * .08;
+    m.castShadow = !!o.shadow; const pv = new THREE.Group(); pv.rotation.y = i * 2.39996 + r() * .25; pv.add(m); g.add(pv); }
+  return g;
+}
+/* a canvas text texture with transparent background */
+function textTex(THREE, w, h, draw){ return canvasTex(THREE, w, h, (g) => { g.clearRect(0, 0, w, h); draw(g, w, h); }); }
+
+/* ბეჭდები აბრეშუმზე · მაკრო კადრი: შამპანურისფერი აბრეშუმი ნაკეცებით, ვარდის ფურცლები, ორი ბეჭედი — ოქრო და თეთრი ოქრო ბრილიანტით.
+   შეხებისას: ბეჭდები ჰაერში ადის და ტრიალებს → ერთმანეთს უახლოვდება და ერთმანეთში ეჭიდება → ნათება, ნაპერწკლები → ერთად ნელა ტრიალებს.
+   ფურცვლისას: კამერა ბეჭდებს ირგვლივ უვლის. */
+
+const __scene = async function(THREE, { canvas }){
+  const S = stage(THREE, canvas, { fov: 34, exposure: 1.0, fitW: 2.7, fitH: 3.3, shadows: true }), { R, scene, cam } = S, r = rng(4);
+  scene.background = skyTex(THREE, [[0, "#3B2E25"], [.5, "#6E5A48"], [1, "#B39A80"]]);
+  scene.environment = await envMap(THREE, R, .04); scene.environmentIntensity = .45;
+  await post(THREE, S, { strength: .55, radius: .4, threshold: .95 });
+  const bk = bokeh(THREE, scene, 50, { colors: [0xffe2b8, 0xfff2dc, 0xffd29a], x: [-7, 7], y: [1, 7], z: [-6, -14], size: [.5, 1.5], op: [.03, .11], seed: 21 });
+  scene.add(new THREE.HemisphereLight(0xfff4e6, 0x6a5444, .15));
+  const key = new THREE.DirectionalLight(0xfff0dc, 1.5); key.position.set(3, 6, 3); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 8; key.shadow.bias = -.0003;
+  Object.assign(key.shadow.camera, { left: -3, right: 3, top: 3, bottom: -3, near: 1, far: 15 }); scene.add(key);
+  const rimL = new THREE.PointLight(0xffd9a8, 3, 6, 1.5); rimL.position.set(-1.5, 2, -1.5); scene.add(rimL);
+  const flare = new THREE.PointLight(0xfff0d0, 0, 4, 1.6); flare.position.set(0, 1.2, .3); scene.add(flare);
+
+  /* silk with soft folds */
+  const H = (x, z) => .16 * Math.sin(x * 1.2 + z * .5) + .1 * Math.sin(z * 2.0 - x * .7) + .04 * Math.sin((x + z) * 4.1) - .06 * Math.exp(-(x * x + z * z) * .6);
+  const sg = new THREE.PlaneGeometry(16, 16, 200, 200); sg.rotateX(-Math.PI / 2); const sp = sg.attributes.position;
+  for (let i = 0; i < sp.count; i++) sp.setY(i, H(sp.getX(i), sp.getZ(i))); sg.computeVertexNormals();
+  const silk = new THREE.Mesh(sg, new THREE.MeshPhysicalMaterial({ color: 0xb39c80, roughness: .42, sheen: .8, sheenColor: new THREE.Color(0xf2dcc0), sheenRoughness: .35, clearcoat: .1, envMapIntensity: .5 })); silk.receiveShadow = true; scene.add(silk);
+
+  /* rose petals lying on the silk */
+  const ps = new THREE.Shape(); ps.moveTo(0, 0); ps.bezierCurveTo(.5, .1, .55, .75, 0, 1); ps.bezierCurveTo(-.55, .75, -.5, .1, 0, 0);
+  const pg = new THREE.ShapeGeometry(ps, 12), pp = pg.attributes.position; for (let i = 0; i < pp.count; i++){ const x = pp.getX(i), y = pp.getY(i); pp.setZ(i, .18 * x * x + .1 * y * y); } pg.computeVertexNormals();
+  const petalMats = [0xf3c7cc, 0xfaf3ea, 0xe7a9b2].map(c => new THREE.MeshPhysicalMaterial({ color: c, roughness: .5, sheen: 1, sheenColor: new THREE.Color(0xffffff), side: THREE.DoubleSide }));
+  for (let i = 0; i < 16; i++){ const a = r() * 6.28, d = 1.3 + r() * 1.8, x = Math.cos(a) * d, z = Math.sin(a) * d * .8 - .3, m = new THREE.Mesh(pg, petalMats[i % 3]); m.scale.setScalar(.22 + r() * .12); m.position.set(x, H(x, z) + .02, z); m.rotation.set(-Math.PI / 2 + (r() - .5) * .4, 0, r() * 6.28); m.castShadow = m.receiveShadow = true; scene.add(m); }
+
+  /* the rings */
+  const gold = new THREE.MeshPhysicalMaterial({ color: 0xf0c56a, metalness: 1, roughness: .1, clearcoat: .6, envMapIntensity: 1.8 });
+  const plat = new THREE.MeshPhysicalMaterial({ color: 0xeceef3, metalness: 1, roughness: .08, clearcoat: .6, envMapIntensity: 1.9 });
+  const bandG = (R0, w, th) => { const sh = new THREE.Shape(); sh.absarc(0, 0, th, 0, Math.PI * 2, false); const pts = []; for (let i = 0; i <= 40; i++){ const a = i / 40 * Math.PI * 2; pts.push(new THREE.Vector2(R0 + Math.cos(a) * th, Math.sin(a) * w)); } return new THREE.LatheGeometry(pts, 160).rotateX(Math.PI / 2); };
+  const ringA = new THREE.Group(), ringB = new THREE.Group(); scene.add(ringA, ringB);
+  const bandA = new THREE.Mesh(bandG(.5, .1, .06), gold); bandA.castShadow = true; ringA.add(bandA);
+  const bandB = new THREE.Mesh(bandG(.44, .07, .045), plat); bandB.castShadow = true; ringB.add(bandB);
+  /* brilliant-cut diamond in a four-prong setting */
+  const crown = new THREE.CylinderGeometry(.075, .13, .06, 16, 1), pav = new THREE.ConeGeometry(.13, .13, 16, 1);
+  const diamond = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: 0, transmission: 1, ior: 2.42, thickness: .4, envMapIntensity: 3.2, specularIntensity: 1, iridescence: .35, flatShading: true });
+  const gem = new THREE.Group(); const c1 = new THREE.Mesh(crown, diamond), c2 = new THREE.Mesh(pav, diamond); c2.rotation.x = Math.PI; c2.position.y = -.095; gem.add(c1, c2); gem.position.set(0, .5 + .13, 0); ringB.add(gem);
+  for (let i = 0; i < 4; i++){ const a = i / 4 * Math.PI * 2 + Math.PI / 4, pr = new THREE.Mesh(new THREE.CylinderGeometry(.012, .016, .17, 8), plat); pr.position.set(Math.cos(a) * .1, .5 + .08, Math.sin(a) * .1); pr.rotation.set(Math.sin(a) * .25, 0, -Math.cos(a) * .25); ringB.add(pr); }
+  const basket = new THREE.Mesh(new THREE.CylinderGeometry(.09, .05, .08, 16), plat); basket.position.y = .5 + .02; ringB.add(basket);
+  const glints = [0, 1, 2].map(() => { const s = glow(THREE, 0xffffff, .2, 0); gem.add(s); return s; });
+  const burst = points(THREE, 160, .05, 0xffe9b8); scene.add(burst.pts); const bv = Array.from({ length: burst.n }, () => { const a = r() * 6.28, e = (r() - .5) * 2.4, s = .6 + r() * 1.6; return [Math.cos(a) * Math.cos(e) * s, Math.sin(e) * s, Math.sin(a) * Math.cos(e) * s]; });
+
+  /* start: lying on the silk · end: interlocked in the air (A in the xy-plane, B in the yz-plane) */
+  const Y0 = .9, A0 = { p: new THREE.Vector3(-.62, H(-.62, .3) + .17, .3), q: new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI / 2, 0, .3)) };
+  const B0 = { p: new THREE.Vector3(.6, H(.6, -.2) + .2, -.2), q: new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI / 2 - .35, 0, -.5)) };
+  const A1 = { p: new THREE.Vector3(-.2, Y0, 0), q: new THREE.Quaternion().setFromEuler(new THREE.Euler(0, .0, 0)) }, B1 = { p: new THREE.Vector3(.2, Y0 + .3, 0), q: new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI / 2, 0)) };
+  const pair = new THREE.Group(); pair.position.set(0, 0, 0); scene.add(pair);
+  const tq = new THREE.Quaternion(), spinQ = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), tp = new THREE.Vector3(), pivot = new THREE.Vector3(0, Y0, 0);
+  const OPEN = 3.8;
+  function place(ring, P0, P1, k, lift, spin, rot){ tp.copy(P0.p).lerp(P1.p, k); tp.y += Math.sin(Math.min(1, lift) * Math.PI / 2) * (1 - k) * .55; tq.copy(P0.q).slerp(P1.q, k); spinQ.setFromAxisAngle(up, spin); ring.quaternion.copy(spinQ).multiply(tq);
+    tp.sub(pivot).applyAxisAngle(up, rot).add(pivot); ring.position.copy(tp); spinQ.setFromAxisAngle(up, rot); ring.quaternion.premultiply(spinQ); }
+  function update({ t, p, idle, w, h }){
+    S.size(w, h);
+    const on = t >= 0, lift = on ? out(seg(t, 0, 1.0)) : 0, meet = on ? ease(seg(t, .7, 2.3)) : 0, Q = ease(p);
+    const spin = (1 - meet) * lift * Math.PI * 2.2, rot = on ? Math.max(0, t - 2.3) * .35 : 0, hov = on ? Math.sin(idle * 1.1) * .03 * meet : 0;
+    place(ringA, A0, A1, meet, lift, spin, rot); place(ringB, B0, B1, meet, lift, -spin, rot);
+    if (lift > 0 && meet < 1){ ringA.position.y += lift * (1 - meet) * .25; ringB.position.y += lift * (1 - meet) * .25; }
+    ringA.position.y += hov; ringB.position.y += hov;
+    const lk = on ? seg(t, 2.15, 2.4) * (1 - seg(t, 2.5, 3.6)) : 0; flare.intensity = lk * 18;
+    for (let i = 0; i < burst.n; i++){ const k = on ? Math.max(0, t - 2.25) : 0, e = 1 - Math.exp(-k * 2.5); burst.pos[i * 3] = bv[i][0] * e; burst.pos[i * 3 + 1] = Y0 + bv[i][1] * e - k * k * .05; burst.pos[i * 3 + 2] = bv[i][2] * e; }
+    burst.g.attributes.position.needsUpdate = true; burst.pts.material.opacity = on && t > 2.25 ? 1 - seg(t, 2.6, 4.2) : 0;
+    glints.forEach((g, i) => { const s = Math.max(0, Math.sin(idle * (2.6 + i) + i * 2)); g.material.opacity = Math.pow(s, 8) * .9; g.scale.setScalar(.12 + Math.pow(s, 8) * .25); g.position.set((i - 1) * .05, .02 + i * .01, .06); });
+    bk.forEach(b => { b.material.opacity = b.userData.o * (.7 + .3 * Math.sin(idle * .6 + b.userData.ph)); });
+    const d = S.dist, near = on ? ease(seg(t, 1.2, OPEN)) : 0, a = Q * 1.8 + Math.sin(idle * .15) * .05, rad = lerp(d, d * .82, near) + Q * .4;
+    cam.position.set(Math.sin(a) * rad, lerp(1.35, 1.3, near) + Q * .5, Math.cos(a) * rad);
+    cam.lookAt(0, lerp(.15, .82, near), 0);
+    S.render();
+  }
+  return { open: OPEN, update };
+}
+
+window.AMB_SCENE = { THREE, create: __scene }; window.dispatchEvent(new Event("amb-scene"));
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!doctype html>
+<!-- ამბავი · ქორწილის კოლექცია · ანა &amp; ლუკა. ტექსტები და ფერები: config.js · 3D სამყარო: scene.js (ჩაშენებულია ქვემოთ, build.cjs-ით) · ძრავი: amb.js/amb.css -->
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ანა &amp; ლუკა · ამბავი</title>
+<meta name="description" content="სიყვარულით გიწვევთ ჩვენს ქორწილში — ანა &amp; ლუკა">
+<meta property="og:title" content="💌 ანა &amp; ლუკა">
+<meta property="og:description" content="თქვენ მიიღეთ მოსაწვევი">
+<meta name="theme-color" content="#0E0805">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@300;400;500;600&family=Cormorant+Garamond:wght@500;600&family=Pinyon+Script&display=swap">
+<link rel="stylesheet" href="amb.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<script src="config.js"></script>
+<script src="music.js"></script>
+<script src="amb.js"></script>
+<script type="module">
+import * as THREE from "three";
+/* ამბავი 2 · სცენების საერთო ხელსაწყოები */
+const seg = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const out = t => 1 - Math.pow(1 - t, 3);
+const inq = t => t * t;
+const back = t => { const c1 = 1.6, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const lerp = (a, b, k) => a + (b - a) * k;
+function rng(seed = 1){ let s = seed >>> 0 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+
+/* renderer + camera that keeps a subject of width `fitW` inside a portrait screen */
+function stage(THREE, canvas, { fov = 40, exposure = 1, fitW = 4, fitH = 6, shadows = false } = {}){
+  const R = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+  R.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = exposure;
+  if (shadows){ R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap; }
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(fov, 1, .05, 600);
+  const st = { R, scene, cam, dist: 10, aspect: 1 };
+  st.render = () => R.render(scene, cam);
+  st.size = (w, h) => { if (st._w === w && st._h === h) return; st._w = w; st._h = h; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+    const tf = Math.tan(THREE.MathUtils.degToRad(fov / 2)); st.aspect = cam.aspect; st.dist = Math.max(fitH / (2 * tf), fitW / (2 * tf * cam.aspect)); };
+  return st;
+}
+function canvasTex(THREE, w, h, draw, srgb = true){ const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
+function skyTex(THREE, stops){ return canvasTex(THREE, 16, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); stops.forEach(([o, c]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(0, 0, w, h); }); }
+function dot(THREE, soft = .28){ return canvasTex(THREE, 64, 64, (g) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(soft, "rgba(255,255,255,.75)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }, false); }
+function glow(THREE, color, size, opacity = 1){ const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: dot(THREE, .18), color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending })); s.scale.setScalar(size); return s; }
+/* a cloud of soft points; returns { pts, pos, n } */
+function points(THREE, n, size, color, opts = {}){
+  const g = new THREE.BufferGeometry(), pos = new Float32Array(n * 3); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const m = new THREE.PointsMaterial({ size, color, map: dot(THREE), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, ...opts });
+  const pts = new THREE.Points(g, m); pts.frustumCulled = false;
+  return { pts, pos, n, g };
+}
+async function envMap(THREE, R, intensity = .04){ const { RoomEnvironment } = await import("https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/environments/RoomEnvironment.js"); return new THREE.PMREMGenerator(R).fromScene(new RoomEnvironment(), intensity).texture; }
+function flash(k){ const f = document.getElementById("flash"); if (f) f.style.opacity = String(k); }
+
+/* ---------- wedding collection: realism helpers ---------- */
+/* bloom post-processing (soft glow on bright highlights); replaces S.render */
+async function post(THREE, S, { strength = .55, radius = .6, threshold = .85 } = {}){
+  const B = "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/";
+  const [{ EffectComposer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }] = await Promise.all(["EffectComposer.js", "RenderPass.js", "UnrealBloomPass.js", "OutputPass.js"].map(f => import(B + f)));
+  const comp = new EffectComposer(S.R); comp.addPass(new RenderPass(S.scene, S.cam));
+  const bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), strength, radius, threshold); comp.addPass(bloom); comp.addPass(new OutputPass());
+  const size0 = S.size; S.size = (w, h) => { const ch = S._w !== w || S._h !== h; size0(w, h); if (ch){ comp.setPixelRatio(S.R.getPixelRatio()); comp.setSize(w, h); } };
+  S.render = () => comp.render(); S.bloom = bloom; return comp;
+}
+/* out-of-focus lights in the background (lens bokeh) */
+function bokehTex(THREE){ return canvasTex(THREE, 128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,.5)"); gr.addColorStop(.72, "rgba(255,255,255,.58)"); gr.addColorStop(.87, "rgba(255,255,255,.9)"); gr.addColorStop(.95, "rgba(255,255,255,.3)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }, false); }
+function bokeh(THREE, scene, n, o = {}){
+  const r = rng(o.seed || 3), tex = bokehTex(THREE), cols = o.colors || [0xffd9a0, 0xffe9c8, 0xfff4e0], list = [];
+  const L = (a, k) => lerp(a[0], a[1], k);
+  for (let i = 0; i < n; i++){ const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color: cols[i % cols.length], transparent: true, opacity: L(o.op || [.08, .3], r()), depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+    s.scale.setScalar(L(o.size || [.5, 2], r())); s.position.set(L(o.x || [-12, 12], r()), L(o.y || [-1, 9], r()), L(o.z || [-8, -26], r())); s.userData.o = s.material.opacity; s.userData.ph = r() * 6; scene.add(s); list.push(s); }
+  return list;
+}
+/* a garden rose made of curled petals in a golden-angle spiral; ~1 unit tall */
+function rose(THREE, o = {}){
+  const n = o.petals || 24, base = new THREE.Color(o.base || 0xf2cfc8), tip = new THREE.Color(o.color || 0xfffaf3), r = rng(o.seed || 1);
+  const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.bezierCurveTo(.42, .12, .55, .7, .3, 1); sh.bezierCurveTo(.15, 1.12, -.15, 1.12, -.3, 1); sh.bezierCurveTo(-.55, .7, -.42, .12, 0, 0);
+  const g = new THREE.Group(), mat = o.mat || new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: .55, sheen: 1, sheenColor: new THREE.Color(0xffffff), sheenRoughness: .45, side: THREE.DoubleSide });
+  for (let i = 0; i < n; i++){ const k = i / (n - 1), geo = new THREE.ShapeGeometry(sh, 10), p = geo.attributes.position, cols = new Float32Array(p.count * 3), c = new THREE.Color();
+    const cup = lerp(1.7, .7, k), curl = lerp(0, .55, k * k * k);
+    for (let j = 0; j < p.count; j++){ const x = p.getX(j), y = p.getY(j); p.setZ(j, -cup * x * x + curl * y * y * y); c.copy(base).lerp(tip, Math.min(1, y * 1.15 + k * .35)); cols[j * 3] = c.r; cols[j * 3 + 1] = c.g; cols[j * 3 + 2] = c.b; }
+    geo.setAttribute("color", new THREE.BufferAttribute(cols, 3)); geo.computeVertexNormals();
+    const m = new THREE.Mesh(geo, mat), s = lerp(.28, 1, Math.pow(k, .7)); m.scale.set(s * lerp(.75, 1.1, k), s, s); m.position.z = lerp(.02, .1, k); m.rotation.x = lerp(.05, .92, Math.pow(k, 1.6)) + (r() - .5) * .08;
+    m.castShadow = !!o.shadow; const pv = new THREE.Group(); pv.rotation.y = i * 2.39996 + r() * .25; pv.add(m); g.add(pv); }
+  return g;
+}
+/* a canvas text texture with transparent background */
+function textTex(THREE, w, h, draw){ return canvasTex(THREE, w, h, (g) => { g.clearRect(0, 0, w, h); draw(g, w, h); }); }
+
+/* შამპანურის კოშკი · ბროლის ბოკალების პირამიდა თეთრ სუფრაზე, უკან — დარბაზის თბილი შუქები (bokeh).
+   შეხებისას: ბოთლი შემოდის და ასხამს → შამპანური ზედა ბოკალიდან რიგ-რიგად ქვემოთ ჩაედინება და ავსებს →
+   ბუშტუკები ამოდის, კიდეებზე ნაპერწკლები ციმციმებს → კამერა ზემოთ ადის.  ფურცვლისას: კამერა კოშკს ირგვლივ უვლის. */
+
+const __scene = async function(THREE, { canvas, C }){
+  await Promise.race([Promise.all(['500 60px "Noto Serif Georgian"', '400 60px "Pinyon Script"'].map(f => document.fonts.load(f, "ა A"))), new Promise(r => setTimeout(r, 2500))]);
+  const S = stage(THREE, canvas, { fov: 36, exposure: 1.0, fitW: 4.3, fitH: 5.4, shadows: true }), { R, scene, cam } = S, r = rng(5);
+  scene.background = skyTex(THREE, [[0, "#120B07"], [.55, "#23170E"], [1, "#352315"]]);
+  scene.environment = await envMap(THREE, R, .04); scene.environmentIntensity = .7;
+  await post(THREE, S, { strength: .45, radius: .5, threshold: .93 });
+  const bk = bokeh(THREE, scene, 80, { colors: [0xffc778, 0xffe0aa, 0xfff0d2, 0xffaa5e], x: [-10, 10], y: [-1, 9], z: [-7, -22], size: [.35, 1.5], op: [.04, .16], seed: 9 });
+  scene.add(new THREE.HemisphereLight(0xfff0dc, 0x2a1a10, .2));
+  const key = new THREE.SpotLight(0xfff1dc, 16, 22, .42, .7, 1.2); key.position.set(3, 7.5, 5); key.target.position.set(0, 1.3, 0); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -.0004; key.shadow.radius = 6; scene.add(key, key.target);
+  const rim = new THREE.DirectionalLight(0xffc98a, 1.4); rim.position.set(-4, 3, -6); scene.add(rim);
+  const inner = new THREE.PointLight(0xffc860, 0, 5, 1.6); inner.position.set(0, 1.4, .6); scene.add(inner);
+
+  /* table with white linen */
+  const linen = new THREE.MeshStandardMaterial({ color: 0xcfc4b2, roughness: .9 });
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(2.9, 2.9, .06, 96), linen); top.position.y = -.03; top.receiveShadow = true; scene.add(top);
+  const drapeG = new THREE.CylinderGeometry(2.92, 3.1, 2.2, 128, 6, true), dp = drapeG.attributes.position;
+  for (let i = 0; i < dp.count; i++){ const x = dp.getX(i), z = dp.getZ(i), y = dp.getY(i), a = Math.atan2(z, x), k = (1.1 - y) / 2.2, f = 1 + .025 * k * Math.sin(a * 22); dp.setX(i, x * f); dp.setZ(i, z * f); }
+  drapeG.computeVertexNormals(); const drape = new THREE.Mesh(drapeG, linen); drape.position.y = -1.13; drape.receiveShadow = true; scene.add(drape);
+
+  /* crystal coupes */
+  const P = (a) => a.map(([x, y]) => new THREE.Vector2(x, y));
+  const coupeG = new THREE.LatheGeometry(P([[0, 0], [.21, 0], [.22, .012], [.05, .05], [.028, .1], [.026, .4], [.04, .44], [.13, .47], [.27, .52], [.36, .58], [.39, .63], [.397, .65], [.386, .652], [.35, .605], [.26, .548], [.12, .502], [0, .488]]), 56);
+  const crystal = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .03, transmission: 1, thickness: .06, ior: 1.52, clearcoat: 1, envMapIntensity: 2.6, side: THREE.DoubleSide });
+  const IN = [[0, .489], [.12, .503], [.26, .549], [.35, .606], [.386, .65]];
+  const innerX = y => { for (let i = 1; i < IN.length; i++) if (y <= IN[i][1]){ const [x0, y0] = IN[i - 1], [x1, y1] = IN[i]; return lerp(x0, x1, (y - y0) / (y1 - y0)); } return IN[IN.length - 1][0]; };
+  const wine = new THREE.MeshStandardMaterial({ color: 0xe9bd55, roughness: .12, metalness: .25, emissive: 0x5c3906, emissiveIntensity: .55 });
+  const liquidGeo = f => { const fh = lerp(.49, .64, f), pts = IN.filter(p => p[1] < fh).map(([x, y]) => new THREE.Vector2(x * .97, y)); pts.push(new THREE.Vector2(innerX(fh) * .97, fh), new THREE.Vector2(0, fh)); return new THREE.LatheGeometry(pts, 40); };
+  const glasses = [], SP = .8, LH = .655;
+  for (let L = 0; L < 4; L++){ const n = 4 - L; for (let i = 0; i < n; i++) for (let j = 0; j < n; j++){
+    const g = new THREE.Mesh(coupeG, crystal); g.position.set((i - (n - 1) / 2) * SP, L * LH, (j - (n - 1) / 2) * SP); g.castShadow = true; scene.add(g);
+    const liq = new THREE.Mesh(liquidGeo(.01), wine); liq.position.copy(g.position); liq.visible = false; scene.add(liq);
+    const glint = glow(THREE, 0xfff6e0, .16, 0); glint.position.set(g.position.x + .3, g.position.y + .66, g.position.z + .25); scene.add(glint);
+    glasses.push({ g, liq, glint, L, f: 0, ph: r() * 6 }); } }
+  const topY = 3 * LH;
+
+  /* the bottle, pivoting at its mouth */
+  const bottle = new THREE.Group(); scene.add(bottle);
+  const bodyG = new THREE.LatheGeometry(P([[0, 0], [.2, 0], [.22, .03], [.222, .95], [.2, 1.15], [.13, 1.35], [.078, 1.5], [.075, 1.72], [.088, 1.74], [.085, 1.8], [0, 1.8]]), 48);
+  const bmesh = new THREE.Mesh(bodyG, new THREE.MeshPhysicalMaterial({ color: 0x0d2414, roughness: .1, clearcoat: 1, metalness: .15, envMapIntensity: 1.4 })); bmesh.position.y = -1.8; bmesh.castShadow = true; bottle.add(bmesh);
+  const foil = new THREE.Mesh(new THREE.CylinderGeometry(.088, .105, .42, 32), new THREE.MeshStandardMaterial({ color: 0xd9b25a, metalness: 1, roughness: .32 })); foil.position.y = -.24; bottle.add(foil);
+  const names = C.b ? C.a + " & " + C.b : C.a, d0 = new Date(C.date + "T12:00:00");
+  const labTex = canvasTex(THREE, 1024, 300, (g, w, h) => { g.fillStyle = "#f3ead8"; g.fillRect(0, 0, w, h); g.strokeStyle = "#b8924a"; g.lineWidth = 6; g.strokeRect(300, 20, 424, h - 40); g.textAlign = "center"; g.fillStyle = "#6a4a1c";
+    g.font = '400 64px "Pinyon Script"'; g.fillText(C.script || names, w / 2, 140); g.font = '500 30px "Noto Serif Georgian"'; g.fillText(String(d0.getDate()).padStart(2, "0") + " · " + String(d0.getMonth() + 1).padStart(2, "0") + " · " + d0.getFullYear(), w / 2, 220); });
+  const label = new THREE.Mesh(new THREE.CylinderGeometry(.224, .224, .42, 48, 1, true), new THREE.MeshStandardMaterial({ map: labTex, roughness: .7 })); label.position.y = -1.8 + .52; label.rotation.y = -Math.PI / 2; bottle.add(label);
+  const stream = new THREE.Mesh(new THREE.CylinderGeometry(.022, .03, 1, 12, 1, true), new THREE.MeshBasicMaterial({ color: 0xffd36a, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })); scene.add(stream);
+
+  /* bubbles inside the glasses + overflow drops */
+  const bub = points(THREE, 700, .025, 0xfff4d0); scene.add(bub.pts); const bv = Array.from({ length: bub.n }, (_, i) => [i % glasses.length, r() * 6.28, Math.sqrt(r()), r()]);
+  const drops = points(THREE, 360, .05, 0xffd775); scene.add(drops.pts); const dv = Array.from({ length: drops.n }, () => [Math.floor(r() * 14), r() * 6.28, r()]);
+
+  const OPEN = 3.9, mouth = new THREE.Vector3(-.12, topY + 1.05, .05), tgt = new THREE.Vector3(0, topY + .56, 0);
+  function update({ t, p, idle, w, h }){
+    S.size(w, h);
+    const on = t >= 0, enter = on ? ease(seg(t, 0, .7)) : 0, leave = on ? ease(seg(t, 2.6, 3.3)) : 0, pour = on && t > .65 && t < 2.75, Q = ease(p);
+    bottle.position.set(lerp(-2.6, mouth.x, enter) - leave * 2.4, lerp(topY + 3.2, mouth.y, enter) + leave * 1.6, mouth.z);
+    bottle.rotation.z = lerp(-.4, -2.05, ease(seg(t, .1, .75))) + leave * 1.4; bottle.visible = on && leave < 1;
+    stream.visible = pour; if (pour){ const a = bottle.position, d = a.distanceTo(tgt); stream.position.copy(a).add(tgt).multiplyScalar(.5); stream.scale.set(1, d, 1); stream.lookAt(tgt); stream.rotateX(Math.PI / 2); stream.material.opacity = .85 * Math.min(seg(t, .65, .8), 1 - seg(t, 2.6, 2.75)); }
+    for (const G of glasses){ const st = .75 + (3 - G.L) * .5, f = on ? ease(seg(t, st, st + .75)) : 0;
+      if (Math.abs(f - G.f) > .012 || (f === 1 && G.f !== 1)){ G.f = f; G.liq.visible = f > .01; if (G.liq.visible){ G.liq.geometry.dispose(); G.liq.geometry = liquidGeo(f); } }
+      G.glint.material.opacity = G.f > .9 ? Math.max(0, Math.sin(idle * 2.3 + G.ph * 3)) * .9 : 0; }
+    for (let i = 0; i < bub.n; i++){ const [gi, a, rr, ph] = bv[i], G = glasses[gi], fh = lerp(.49, .64, G.f), k = (ph + idle * .35) % 1, y = lerp(.495, fh - .005, k);
+      bub.pos[i * 3] = G.g.position.x + Math.cos(a + k * 2) * innerX(y) * .85 * rr; bub.pos[i * 3 + 1] = G.f > .05 ? G.g.position.y + y : -50; bub.pos[i * 3 + 2] = G.g.position.z + Math.sin(a + k * 2) * innerX(y) * .85 * rr; }
+    bub.g.attributes.position.needsUpdate = true;
+    for (let i = 0; i < drops.n; i++){ const [gi, a, ph] = dv[i], G = glasses[gi], src = G.L >= 1, st = .75 + (3 - G.L) * .5 + .7, run = on && src && t > st && t < st + 1.4;
+      const k = (ph + idle * 1.6) % 1; drops.pos[i * 3] = G.g.position.x + Math.cos(a) * (.4 + k * .06); drops.pos[i * 3 + 1] = run ? G.g.position.y + .64 - k * .62 : -50; drops.pos[i * 3 + 2] = G.g.position.z + Math.sin(a) * (.4 + k * .06); }
+    drops.g.attributes.position.needsUpdate = true;
+    inner.intensity = on ? seg(t, 1, 3) * 6 : 0;
+    bk.forEach(b => { b.material.opacity = b.userData.o * (.75 + .25 * Math.sin(idle * .7 + b.userData.ph)); });
+    const d = S.dist, rise = on ? ease(seg(t, .4, OPEN)) : 0, a = Q * 1.5 + Math.sin(idle * .12) * .06, rad = lerp(d, d * .9, rise) + Q * 1.2;
+    cam.position.set(Math.sin(a) * rad, lerp(1.25, 2.05, rise) + Q * 1.4, Math.cos(a) * rad);
+    cam.lookAt(0, lerp(1.45, 1.75, rise) + Q * .2, 0);
+    S.render();
+  }
+  return { open: OPEN, update };
+}
+
+window.AMB_SCENE = { THREE, create: __scene }; window.dispatchEvent(new Event("amb-scene"));
+</script>
+</body>
+</html>
