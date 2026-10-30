@@ -1,0 +1,8 @@
+# დროებითი ვიდეო-კადრები (6+ GB, ხელახლა იქმნება)
+მოსაწვევები/_tools/frames/
+# ადგილობრივი პარამეტრები და სისტემური ფაილები
+.claude/settings.local.json
+.vercel/
+node_modules/
+Thumbs.db
+desktop.ini

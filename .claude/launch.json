@@ -1,0 +1,25 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "roma-khatia",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:/Users/User/AppData/Local/Temp/claude/C--Users-User-Desktop-Procect-wedding/7ba39f94-16d3-4178-b27a-ccfef5bdd9cf/scratchpad/serve.mjs",
+        "C:/Users/User/Desktop/Procect wedding/მოსაწვევები/wedding-roma-khatia",
+        "5510"
+      ],
+      "port": 5510
+    },
+    {
+      "name": "ambavi-public",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:/Users/User/AppData/Local/Temp/claude/C--Users-User-Desktop-Procect-wedding/7ba39f94-16d3-4178-b27a-ccfef5bdd9cf/scratchpad/serve.mjs",
+        "C:/Users/User/Desktop/ambavi-site/public",
+        "5520"
+      ],
+      "port": 5520
+    }
+  ]
+}
