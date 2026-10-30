@@ -1,0 +1,129 @@
+<!doctype html><html lang="ka"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@500;600&family=Noto+Serif+Georgian:wght@300;400;500;600&display=swap">
+<style>
+/* ამბავი · დამატებითი პოსტები 1280x1600: ?s=features | faq | sample | deadline | gift ; საჩუქრის ბარათი 1600x1000: ?s=cert&to=&from=&pkg=&code=&until= */
+html,body{margin:0}
+body{width:1280px;height:1600px;overflow:hidden;position:relative;font-family:"Noto Serif Georgian",serif;color:#4E4237;background:radial-gradient(90% 70% at 50% 35%,#FBF7F0,#EDE4D6)}
+body.cert{width:1600px;height:1000px}
+.pat{position:absolute;inset:0;opacity:.07}
+.pearl{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0%,#F3EEE6 45%,#CFC3B2 100%);box-shadow:0 2px 4px rgba(90,70,40,.25)}
+.hd{position:absolute;top:60px;left:0;right:0;text-align:center}
+.hd .b{margin:0;font:500 30px/1 "Noto Serif Georgian";letter-spacing:.5em;text-indent:.5em;color:#8E7F70}
+.hd h1{margin:22px 0 0;font:500 62px/1.15 "Noto Serif Georgian";color:#4E4237}
+.hd h1 em{font-style:normal;color:#A88449}
+.hd p{margin:16px 0 0;font:400 23px/1.45 "Noto Serif Georgian";color:#8E7F70}
+.card{position:relative;border-radius:30px;background:#FFFDF9;box-shadow:0 0 0 1px rgba(168,132,73,.18),inset 0 0 0 10px #FFFDF9,inset 0 0 0 11px rgba(168,132,73,.12),0 30px 60px -36px rgba(90,70,40,.5)}
+.btn{display:inline-block;padding:20px 46px;border-radius:50px;font:500 27px/1 "Noto Serif Georgian";color:#fff;background:linear-gradient(135deg,#D9BC7E,#A88449);box-shadow:0 18px 36px -16px rgba(120,90,40,.6);white-space:nowrap}
+.btn b{font:600 34px/1 "Cormorant Garamond"}
+.foot{position:absolute;bottom:54px;left:0;right:0;text-align:center}
+.foot .cta{font:500 25px/1.3 "Noto Serif Georgian";color:#8E6B33}
+.foot .sm{margin-top:18px;font:400 20px/1 "Noto Serif Georgian";letter-spacing:.24em;color:#9A8B7C}
+.shot{position:absolute;border-radius:34px;overflow:hidden;background:#fff center top/cover no-repeat;box-shadow:0 0 0 2px rgba(255,255,255,.9),0 0 0 3px rgba(168,132,73,.25),0 40px 70px -30px rgba(90,70,40,.55)}
+.lab{position:absolute;text-align:center;font:500 22px/1.3 "Noto Serif Georgian"}
+.lab small{display:block;margin-top:6px;font:400 16px/1.35 "Noto Serif Georgian";color:#8E7F70}
+.lab i{display:grid;place-items:center;width:52px;height:52px;margin:0 auto 10px;border-radius:50%;font-style:normal;font-size:24px;background:linear-gradient(135deg,#F3E6C8,#E2CB98);box-shadow:0 8px 16px -8px rgba(120,90,40,.5)}
+/* faq */
+.qa{position:absolute;left:90px;right:90px;top:310px;display:grid;gap:22px}
+.qa .card{padding:32px 38px 30px}
+.qa h3{margin:0;font:500 24px/1.3 "Noto Serif Georgian";display:flex;gap:14px;align-items:baseline}
+.qa h3 b{flex:none;font:600 30px/1 "Cormorant Garamond";color:#A88449}
+.qa p{margin:12px 0 0 34px;font:400 20px/1.55 "Noto Serif Georgian";color:#6E6052}
+/* deadline */
+.big{position:absolute;left:0;right:0;text-align:center;font:600 300px/1 "Cormorant Garamond";background:linear-gradient(135deg,#D9BC7E,#A88449 55%,#C9A867);-webkit-background-clip:text;background-clip:text;color:transparent}
+.until{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;padding:16px 38px;border-radius:40px;font:500 30px/1 "Noto Serif Georgian";color:#fff;background:#C0564B;box-shadow:0 14px 30px -12px rgba(150,60,50,.6)}
+.mini{position:absolute;left:90px;right:90px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.mini .card{padding:30px 20px 26px;text-align:center}
+.mini h3{margin:0;font:500 25px/1.2 "Noto Serif Georgian"}
+.mini s{display:block;margin-top:14px;font:600 34px/1 "Cormorant Garamond";color:#B8AB9B;text-decoration-color:#C0564B;text-decoration-thickness:3px}
+.mini b{display:block;margin-top:6px;font:600 70px/1 "Cormorant Garamond";color:#A88449}
+.mini b small{font:500 36px/1 "Noto Serif Georgian"}
+/* gift */
+.gc{position:absolute;left:50%;top:320px;width:820px;height:512px;margin-left:-410px;transform:rotate(-4deg);border-radius:28px;overflow:hidden;box-shadow:0 50px 90px -40px rgba(90,60,30,.7)}
+.gc img{display:block;width:100%;height:100%}
+.ribbon{position:absolute;right:170px;top:270px;font-size:120px;transform:rotate(12deg);filter:drop-shadow(0 16px 20px rgba(0,0,0,.25))}
+.gsteps{position:absolute;left:90px;right:90px;top:960px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.gsteps .card{padding:28px 22px 24px;text-align:center}
+.gsteps .n{display:grid;place-items:center;width:58px;height:58px;margin:0 auto 14px;border-radius:50%;font:600 30px/1 "Cormorant Garamond";color:#fff;background:linear-gradient(135deg,#D9BC7E,#A88449)}
+.gsteps h3{margin:0;font:500 22px/1.3 "Noto Serif Georgian"}
+.gsteps p{margin:8px 0 0;font:400 16.5px/1.5 "Noto Serif Georgian";color:#7C6E60}
+.gp{position:absolute;left:0;right:0;top:1230px;display:flex;justify-content:center;gap:16px}
+.gp span{padding:14px 26px;border-radius:30px;font:400 21px/1 "Noto Serif Georgian";background:rgba(255,253,249,.85);box-shadow:inset 0 0 0 1px rgba(168,132,73,.3)}
+.gp b{font:600 28px/1 "Cormorant Garamond";color:#A88449}
+.inc{position:absolute;left:80px;right:80px;display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
+.inc span{padding:13px 22px;border-radius:30px;font:400 19px/1 "Noto Serif Georgian";background:rgba(255,253,249,.85);box-shadow:inset 0 0 0 1px rgba(168,132,73,.28)}
+/* certificate */
+.cw{position:absolute;inset:0;background:linear-gradient(135deg,#2E2620,#4A3B2E 50%,#2A221C)}
+.cf{position:absolute;inset:34px;border-radius:24px;border:3px solid #C9A867}
+.cf2{position:absolute;inset:52px;border-radius:16px;border:1px solid rgba(201,168,103,.55)}
+.cert .gold{background:linear-gradient(120deg,#A9823A,#E2C27A 30%,#F8E7B5 48%,#E2C27A 64%,#9A7432);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cb{position:absolute;top:96px;left:0;right:0;text-align:center;font:500 26px/1 "Noto Serif Georgian";letter-spacing:.6em;text-indent:.6em;color:#E2C27A}
+.ct{position:absolute;top:150px;left:0;right:0;text-align:center;font:500 84px/1.1 "Noto Serif Georgian"}
+.cs{position:absolute;top:268px;left:0;right:0;text-align:center;font:400 54px/1 "Great Vibes";color:#E9D4A2}
+.cfields{position:absolute;top:380px;left:200px;right:200px;display:grid;grid-template-columns:1fr 1fr;gap:34px 60px;color:#F6EBD6}
+.cfields div{font:400 22px/1 "Noto Serif Georgian";color:rgba(246,235,214,.7)}
+.cfields div b{display:block;margin-top:12px;padding-bottom:10px;min-height:36px;font:500 32px/1.1 "Noto Serif Georgian";color:#F8E7B5;border-bottom:1.5px solid rgba(226,194,122,.55)}
+.cfields .full{grid-column:1/-1}
+.cfoot{position:absolute;bottom:84px;left:0;right:0;text-align:center;font:400 21px/1.5 "Noto Serif Georgian";color:rgba(246,235,214,.75)}
+.seal{position:absolute;right:120px;bottom:110px;width:150px;height:150px;border-radius:50%;display:grid;place-items:center;text-align:center;font:500 17px/1.25 "Noto Serif Georgian";color:#3A2E22;background:radial-gradient(circle at 35% 30%,#F8E7B5,#E2C27A 45%,#A9823A);box-shadow:0 0 0 6px rgba(226,194,122,.25),0 20px 30px -10px rgba(0,0,0,.6);transform:rotate(-10deg)}
+</style></head><body>
+<svg class="pat" width="1600" height="1600"><defs><pattern id="p" width="120" height="120" patternUnits="userSpaceOnUse"><g fill="none" stroke="#8C6E3F" stroke-width="1.2"><circle cx="60" cy="60" r="6"/><path d="M60 40 q8 10 0 20 q-8 -10 0 -20 M80 60 q-10 8 -20 0 q10 -8 20 0 M60 80 q-8 -10 0 -20 q8 10 0 20 M40 60 q10 -8 20 0 q-10 8 -20 0"/></g></pattern></defs><rect width="1600" height="1600" fill="url(#p)"/></svg>
+<div id="pearls"></div><div id="r"></div>
+<script>
+const Q = new URLSearchParams(location.search), s = Q.get("s") || "features", r = document.getElementById("r");
+const shot = (f, x, y, w, rot) => `<div class="shot" style="background-image:url(../out/shots/${f}.jpg);left:${x}px;top:${y}px;width:${w}px;height:${Math.round(w * 844 / 390)}px;transform:rotate(${rot || 0}deg)"></div>`;
+const esc = v => String(v || "").replace(/[<>&]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]));
+const S = {
+features: `<div class="hd"><p class="b">ამბავი</p><h1>რა <em>უყვართ</em> სტუმრებს</h1><p>ყველაფერი ერთ ბმულში — ასე გამოიყურება თქვენს ტელეფონზე</p></div>
+  ${shot("gate", 40, 330, 290, -3)}${shot("count", 345, 360, 290, 0)}${shot("map", 645, 360, 290, 0)}${shot("rsvp", 950, 330, 290, 3)}
+  <div class="lab" style="left:50px;width:290px;top:1030px"><i>✨</i>3D გახსნა<small>სტუმარი ეხება და მოსაწვევი იხსნება</small></div>
+  <div class="lab" style="left:350px;width:290px;top:1030px"><i>⏳</i>უკუთვლა<small>და კალენდარში დამატება ერთი შეხებით</small></div>
+  <div class="lab" style="left:650px;width:290px;top:1030px"><i>📍</i>რუკა<small>მისამართი და გზა — აღარავინ დაიკარგება</small></div>
+  <div class="lab" style="left:950px;width:290px;top:1030px"><i>✅</i>დადასტურება<small>„მოვალ“ თუ „ვერ მოვალ“ — პირდაპირ თქვენთან</small></div>
+  <div class="foot" style="bottom:200px"><span class="btn">🎵 მუსიკით და თქვენი ფოტოებით</span></div>
+  <div class="foot"><div class="cta">💌 შეკვეთისთვის მოგვწერეთ პირადში</div></div>`,
+faq: `<div class="hd"><p class="b">ამბავი</p><h1>ხშირი <em>კითხვები</em></h1><p>ყველაფერი, რაც უნდა იცოდეთ 🤍</p></div>
+  <div class="qa">
+    <div class="card"><h3><b>?</b>როგორ გავუგზავნო სტუმრებს?</h3><p>გიგზავნით ბმულს — ჩააგდებთ Messenger-ში, Viber-ში ან ნებისმიერ ჩატში, ჯგუფში ან პირადად.</p></div>
+    <div class="card"><h3><b>?</b>ბებია-ბაბუაც გახსნის?</h3><p>დიახ! იხსნება ერთი შეხებით ნებისმიერ ტელეფონზე, აპლიკაცია არ სჭირდება.</p></div>
+    <div class="card"><h3><b>?</b>როგორ გავიგო, ვინ მოდის?</h3><p>სტუმრები ღილაკით ადასტურებენ — პასუხი პირდაპირ თქვენ მოგდით.</p></div>
+    <div class="card"><h3><b>?</b>რამდენ სტუმარს შეიძლება გავუგზავნო?</h3><p>ულიმიტოდ — ერთი ბმული ყველასთვის, ფასი არ იცვლება.</p></div>
+    <div class="card"><h3><b>?</b>შემიძლია ჩემი სიმღერა?</h3><p>რა თქმა უნდა — ნებისმიერი სიმღერა, თქვენი არჩევანით.</p></div>
+    <div class="card"><h3><b>?</b>ქაღალდის მოსაწვევიც მინდა</h3><p>მასზე QR კოდს დავამატებთ — დაასკანერებენ და ციფრული გაიხსნება.</p></div>
+  </div>
+  <div class="foot"><div class="cta">💌 სხვა კითხვა? მოგვწერეთ პირადში — სიამოვნებით გიპასუხებთ</div></div>`,
+sample: `<div class="hd"><p class="b">ამბავი</p><h1>ნახეთ <em>ნიმუში</em><br>თქვენს ტელეფონზე 📱</h1><p>სანამ შეუკვეთავთ — თავად გახსენით და ნახეთ, როგორ მუშაობს</p></div>
+  ${shot("hero", 150, 440, 330, -6)}${shot("gate", 800, 440, 330, 6)}
+  <div class="card" style="position:absolute;left:470px;top:560px;width:340px;padding:36px 26px;text-align:center;z-index:2">
+    <div style="font-size:60px">💌</div><div style="margin-top:12px;font:500 28px/1.3 'Noto Serif Georgian'">დაწერეთ<br><span style="color:#A88449">„ნიმუში“</span></div>
+    <div style="margin-top:14px;font:400 18px/1.5 'Noto Serif Georgian';color:#7C6E60">კომენტარში ან პირადში — გამოგიგზავნით ბმულს</div></div>
+  <div class="foot" style="bottom:150px"><span class="btn">🎁 უფასოდ · ვალდებულების გარეშე</span></div>
+  <div class="foot"><div class="sm">ქორწილი · ნათლობა · დაბადების დღე · კორპორატიული</div></div>`,
+deadline: `<div class="hd"><p class="b">ამბავი</p><h1>ნოემბრის <em>შეთავაზება</em></h1><p>ყველა პაკეტზე — ქორწილი, ნიშნობა, ნათლობა, დაბადების დღე</p></div>
+  <div class="big" style="top:300px">−20%</div><div class="until" style="top:640px">⏳ მხოლოდ 30 ნოემბრამდე</div>
+  <div class="mini" style="top:790px">
+    <div class="card"><h3>კლასიკა</h3><s>99 ₾</s><b>79<small>₾</small></b></div>
+    <div class="card" style="box-shadow:0 0 0 2px #C9A867,0 40px 70px -34px rgba(120,90,40,.55)"><h3>პრემიუმი</h3><s>169 ₾</s><b>135<small>₾</small></b></div>
+    <div class="card"><h3>3D ექსკლუზივი</h3><s>289 ₾</s><b>231<small>₾</small></b></div></div>
+  <div class="inc" style="top:1090px"><span>✨ 3D გახსნა</span><span>🎵 მუსიკა</span><span>📍 რუკა</span><span>✅ დადასტურება</span><span>⏳ უკუთვლა</span></div><div class="foot" style="bottom:170px"><div class="cta" style="font-size:24px;color:#6E6052">თარიღი მოგვიანებითაა? ფასს ახლავე დაგიფიქსირებთ 🤍</div></div>
+  <div class="foot"><span class="btn">💌 დაჯავშნეთ — მოგვწერეთ პირადში</span></div>`,
+gift: `<div class="hd"><p class="b">ამბავი</p><h1>აჩუქე <em>ამბავი</em> 🎁</h1><p>მეგობარი ქორწინდება? აჩუქე 3D მოსაწვევი — საჩუქარი, რომელსაც ყველა სტუმარი ნახავს</p></div>
+  <div class="gc"><img src="../out/cert-sample.jpg"></div>
+  <div class="gsteps"><div class="card"><div class="n">1</div><h3>აირჩიე პაკეტი</h3><p>კლასიკა, პრემიუმი ან ექსკლუზივი</p></div>
+    <div class="card"><div class="n">2</div><h3>მიიღე ბარათი</h3><p>ლამაზ საჩუქრის ბარათს მეგობრის სახელით</p></div>
+    <div class="card"><div class="n">3</div><h3>აჩუქე</h3><p>მეგობარი მოგვწერს და თავის მოსაწვევს ერთად შევქმნით</p></div></div>
+  <div class="gp"><span>კლასიკა <b>99 ₾</b></span><span>პრემიუმი <b>169 ₾</b></span><span>ექსკლუზივი <b>289 ₾</b></span></div>
+  <div class="inc" style="top:1340px"><span>📲 ბარათს მიიღებთ ციფრულად — გაუგზავნით ან დაბეჭდავთ</span><span>📅 მოქმედებს 1 წელი</span></div><div class="foot"><div class="cta">💌 საჩუქრის ბარათისთვის მოგვწერეთ პირადში</div></div>`,
+cert: `<div class="cw"></div><div class="cf"></div><div class="cf2"></div>
+  <div class="cb">ამბავი</div><div class="ct gold">საჩუქრის ბარათი</div><div class="cs">3D ციფრული მოსაწვევი</div>
+  <div class="cfields"><div>ვის:<b>${esc(Q.get("to"))}</b></div><div>ვისგან:<b>${esc(Q.get("from"))}</b></div>
+    <div>პაკეტი:<b>${esc(Q.get("pkg"))}</b></div><div>კოდი:<b>${esc(Q.get("code"))}</b></div>
+    <div class="full">მოქმედებს:<b>${esc(Q.get("until"))}</b></div></div>
+  <div class="cfoot">შეკვეთისას მოგვწერეთ პირადში და გვითხარით ბარათის კოდი 🤍</div>
+  <div class="seal">ამბავი<br>✦<br>საჩუქარი</div>`
+};
+if (s === "cert") document.body.className = "cert";
+r.innerHTML = S[s] || S.features;
+if (s !== "cert"){ let h = ""; for (const [ox, sx] of [[0, 1], [1280, -1]]) for (let k = 0; k < 2; k++) for (let i = 0; i < 16; i++){ const t = i / 15, x = ox + sx * (10 + t * (200 - k * 70)), y = 10 + Math.sin(t * Math.PI) * (90 - k * 40) + t * (40 + k * 30), rr = 6 + Math.sin(t * Math.PI) * 4 - k * 1.5;
+  h += `<i class="pearl" style="left:${x - rr}px;top:${y - rr}px;width:${rr * 2}px;height:${rr * 2}px"></i>`; } document.getElementById("pearls").innerHTML = h; }
+Promise.all([document.fonts.ready, ...[...document.images].map(i => new Promise(x => { if (i.complete) x(); else i.onload = i.onerror = x; }))]).then(() => setTimeout(() => window.__ready = true, 500));
+</script></body></html>

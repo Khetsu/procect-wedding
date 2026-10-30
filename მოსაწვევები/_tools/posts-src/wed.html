@@ -1,0 +1,48 @@
+<!doctype html><html lang="ka"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Serif+Georgian:wght@300;400;500&family=Pinyon+Script&family=Great+Vibes&family=Alex+Brush&display=swap">
+<style>
+/* ამბავი · ქორწილის კოლექცია — პოსტები 1080x1350: ?d=champagne|chapel|rings|veil|cake|cover */
+html,body{margin:0}
+body{width:1080px;height:1350px;overflow:hidden;position:relative;font-family:"Noto Serif Georgian",serif;color:#3E3328;background:radial-gradient(90% 70% at 50% 40%,#FBF8F2,#EFE7DA)}
+.paper{position:absolute;inset:0;opacity:.35;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .55  0 0 0 0 .45  0 0 0 0 .35  0 0 0 .12 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")}
+.fr{position:absolute;inset:30px;border:1.5px solid rgba(176,141,87,.55)}
+.fr2{position:absolute;inset:40px;border:1px solid rgba(176,141,87,.3)}
+.top{position:absolute;top:70px;left:90px;right:90px;display:flex;justify-content:space-between;font:400 17px/1 "Noto Serif Georgian";letter-spacing:.44em;color:#9A8466}
+.top span:last-child{letter-spacing:.18em}
+h1{position:absolute;top:118px;left:60px;right:60px;margin:0;text-align:center;font:400 70px/1.1 "Noto Serif Georgian";letter-spacing:.02em;color:#3A2E22}
+.sc{position:absolute;top:212px;left:0;right:0;text-align:center;font:400 54px/1 var(--fs,"Pinyon Script");color:#B08D57}
+.orn{position:absolute;top:290px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:14px;color:#B08D57;font-size:18px}
+.orn i{width:90px;height:1px;background:linear-gradient(90deg,transparent,#B08D57)}.orn i:last-child{transform:scaleX(-1)}
+.arch{position:absolute;overflow:hidden;background:#222 center/cover no-repeat;border-radius:999px 999px 18px 18px;box-shadow:0 0 0 1.5px rgba(176,141,87,.7),0 0 0 10px rgba(255,255,255,.55),0 0 0 11px rgba(176,141,87,.35),0 40px 70px -30px rgba(60,40,20,.55)}
+.arch span{position:absolute;left:0;right:0;bottom:0;padding:60px 6px 18px;text-align:center;font:400 19px/1.2 "Noto Serif Georgian";letter-spacing:.06em;color:#fff;background:linear-gradient(transparent,rgba(20,12,6,.6))}
+.info{position:absolute;left:100px;right:100px;top:1112px;text-align:center}
+.info p{margin:0;font:400 21px/1.5 "Noto Serif Georgian";color:#5A4A3A}
+.info p b{font-weight:500;color:#3A2E22}
+.chips{display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.chips span{padding:9px 16px;border-radius:24px;font:400 16px/1 "Noto Serif Georgian";color:#5A4A3A;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(176,141,87,.4)}
+.cta{position:absolute;bottom:62px;left:0;right:0;text-align:center;font:400 20px/1 "Noto Serif Georgian";letter-spacing:.08em;color:#8E6B33}
+</style></head><body><div class="paper"></div><div class="fr"></div><div class="fr2"></div><div id="r"></div>
+<script>
+const D = {
+  champagne: { n: "01", name: "შამპანურის კოშკი", sc: "Champagne Tower", fs: "'Pinyon Script'", open: "შამპანური ბროლის ბოკალებს რიგ-რიგად ავსებს", f: ["0030", "0110", "0190"], cap: ["ბროლის კოშკი", "შამპანური იღვრება", "თქვენი სახელები"], song: "გალა-ვალსი" },
+  chapel: { n: "02", name: "სანთლების ტაძარი", sc: "Candlelit Chapel", fs: "'Cormorant Garamond'", open: "სანთლები რიგ-რიგად ინთება და ფანჯრიდან სინათლე ეცემა", f: ["0030", "0120", "0195"], cap: ["ტაძრის სიმშვიდე", "სანთლები ინთება", "თქვენი სახელები"], song: "ადაჯიო · სიმებიანები" },
+  rings: { n: "03", name: "ბეჭდები", sc: "Forever Rings", fs: "'Great Vibes'", open: "ბეჭდები აბრეშუმიდან ადის და ერთმანეთს ეჭიდება", f: ["0030", "0120", "0190"], cap: ["აბრეშუმზე", "ბეჭდები ეჭიდება", "თქვენი სახელები"], song: "ჩელესტა" },
+  veil: { n: "04", name: "ფატა", sc: "The Veil", fs: "'Alex Brush'", open: "თულის ფატა იწევა და თეთრი ვარდები ჩანს", f: ["0030", "0080", "0190"], cap: ["ფატის მიღმა", "ფატა იწევა", "თქვენი სახელები"], song: "ფორტეპიანოს ბალადა" },
+  cake: { n: "05", name: "საქორწილო ტორტი", sc: "Wedding Cake", fs: "'Great Vibes'", open: "შუქი ქრება და ბენგალური ცეცხლი ინთება", f: ["0030", "0125", "0190"], cap: ["შაქრის ვარდები", "ბენგალური ცეცხლი", "თქვენი სახელები"], song: "სერენადა" }
+};
+const q = new URLSearchParams(location.search).get("d") || "cover", r = document.getElementById("r");
+const A = (slug, f, x, y, w, h, rot, cap, z) => `<div class="arch" style="background-image:url(../frames/w-${slug}/${f}.jpg);left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg);z-index:${z || 1}">${cap ? `<span>${cap}</span>` : ""}</div>`;
+if (D[q]){ const d = D[q]; document.body.style.setProperty("--fs", d.fs);
+  r.innerHTML = `<div class="top"><span>ამბავი</span><span>ქორწილის კოლექცია · ${d.n} / 05</span></div><h1>${d.name}</h1><div class="sc">${d.sc}</div><div class="orn"><i></i>✦<i></i></div>
+  ${A(q, d.f[0], 80, 400, 300, 560, -4, d.cap[0])}${A(q, d.f[2], 700, 400, 300, 560, 4, d.cap[2])}${A(q, d.f[1], 330, 350, 420, 720, 0, d.cap[1], 2)}
+  <div class="info"><p><b>გახსნა:</b> ${d.open}</p><div class="chips"><span>✦ რეალისტური 3D</span><span>🎵 ${d.song}</span><span>📍 რუკა</span><span>🎟 დადასტურება</span></div></div>
+  <div class="cta">შეკვეთისთვის მოგვწერეთ პირადში</div>`;
+} else {
+  const ks = Object.keys(D);
+  r.innerHTML = `<div class="top"><span>ამბავი</span><span>5 დიზაინი</span></div><h1 style="top:122px">ქორწილის კოლექცია</h1><div class="sc" style="top:216px">Wedding Collection</div><div class="orn"><i></i>✦<i></i></div>
+  ${ks.map((k, i) => A(k, D[k].f[1], 82 + i * 186, 380 + (i % 2) * 40, 170, 560, 0, D[k].name)).join("")}
+  <div class="info" style="top:1030px"><p>დახვეწილი, რეალისტური 3D მოსაწვევები —<br>თითოეული თავისი გახსნით და მელოდიით</p><div class="chips"><span>🥂 შამპანური</span><span>🕯 ტაძარი</span><span>💍 ბეჭდები</span><span>🤍 ფატა</span><span>🎂 ტორტი</span></div></div>
+  <div class="cta">გადაფურცლეთ → · შეკვეთისთვის მოგვწერეთ პირადში</div>`;
+}
+Promise.all([document.fonts.ready, ...[...document.querySelectorAll(".arch")].map(e => new Promise(x => { const i = new Image(); i.onload = i.onerror = x; i.src = getComputedStyle(e).backgroundImage.slice(5, -2); }))]).then(() => setTimeout(() => window.__ready = true, 400));
+</script></body></html>

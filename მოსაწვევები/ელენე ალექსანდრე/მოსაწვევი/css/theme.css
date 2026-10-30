@@ -1,0 +1,181 @@
+/* ნაქარგი · Embroidered linen
+   Layout: a linen-and-beads theatre. Beaded cream curtains part on a garden table; a beaded chandelier hangs over
+   a stitched card with the names; pearl garlands separate the sections; the day is told through embroidered
+   scenes of Mtatsminda and Lisi Lake; a hand-stitched envelope collects wishes. Single committed light look. */
+:root{
+  --wash:#F4EEE2;
+  --paper:#FBF7EE;
+  --cobalt:#4A3426;
+  --cobalt-deep:#3A2A1C;
+  --night:#2E2117;
+  --sky:#EFE6D4;
+  --line:#E2D6BF;
+  --gold:#B8955A;
+  --gold-hi:#E8D3A2;
+  --gold-lo:#8E6C2E;
+  --lemon:#C9A86A;
+  --olive:#6E8A5B;
+  --ink:#3A2A1C;
+  --muted:#76624F;
+  --stitch:#C2AD86;
+  --script:"Pinyon Script", "Snell Roundhand", cursive;
+  --goldfoil:linear-gradient(110deg,#8E6C2E 0%,#B8955A 25%,#E3C88E 45%,#B8955A 62%,#8E6C2E 85%,#B8955A 100%);
+  --tile:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Crect width='6' height='6' fill='%23FBF7EE'/%3E%3Cpath d='M0 1.5h6M0 4.5h6' stroke='%23EDE3D0' stroke-width='.8'/%3E%3Cpath d='M1.5 0v6M4.5 0v6' stroke='%23F2EADB' stroke-width='.6'/%3E%3C/svg%3E");
+  --bead:radial-gradient(circle at 42% 38%, #FFFFFF 0 1.2px, #EFE6D4 2.2px, #BFAE8E 3.2px, transparent 3.7px);
+}
+body{color:var(--ink);background:
+  radial-gradient(46rem 30rem at 50% 0%, #FBF7EE 0%, transparent 70%),
+  var(--tile) 0 0/6px 6px, var(--wash)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- opening: beaded curtains ---------- */
+.gate{background:#EFE6D4;justify-content:flex-end;gap:18px;padding-bottom:max(56px, env(safe-area-inset-bottom, 0px))}
+.gate::before{display:none}
+.gate > .stage{position:absolute;inset:0;z-index:0;overflow:hidden}
+.gate > .dust{position:absolute;z-index:3}
+.gate .dust span{background:radial-gradient(circle,#FFFFFF 0%,#F1E3C2 40%,rgba(241,227,194,0) 70%)}
+.behind{position:absolute;inset:0;transition:transform 2.4s cubic-bezier(.2,.7,.2,1)}
+.table-art{position:absolute;inset:0}
+.table-art svg{width:100%;height:100%;display:block}
+.behind-text{position:absolute;left:0;right:0;top:20%;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;color:var(--ink);
+  text-shadow:0 1px 14px rgba(251,247,238,.95)}
+.bt-sm{font-size:.74rem;letter-spacing:.4em}
+.bt-names{font-family:var(--display);font-weight:300;font-size:2.1rem;line-height:1.25}
+.bt-date{font-style:normal;font-family:var(--latin);font-weight:600;letter-spacing:.2em;color:var(--gold-lo)}
+.drape{position:absolute;top:0;bottom:0;width:51%;z-index:2;
+  background:
+    linear-gradient(180deg, rgba(74,52,38,.10), transparent 18%, transparent 80%, rgba(74,52,38,.12)),
+    repeating-linear-gradient(90deg,#E3D6BE 0,#F3ECDE 8px,#FBF7EE 12px,#EADFCA 19px,#D5C5A8 26px,#E3D6BE 31px);
+  box-shadow:inset 0 -30px 40px -30px rgba(74,52,38,.35);
+  transition:transform 2s cubic-bezier(.6,0,.2,1)}
+.drape.l{left:0;transform-origin:0 50%}
+.drape.r{right:0;transform-origin:100% 50%}
+.drape::before{content:"";position:absolute;top:0;bottom:16px;width:9px;background:var(--bead) 0 0/9px 9px repeat-y}
+.drape.l::before{right:2px}.drape.r::before{left:2px}
+.fringe{position:absolute;left:0;right:0;bottom:0;height:18px;background:var(--bead) 0 4px/9px 9px repeat-x, var(--bead) 4px 12px/9px 9px repeat-x}
+.tie{position:absolute;top:57%;left:0;right:0;height:12px;opacity:0;transition:opacity .8s 1.2s;
+  background:radial-gradient(circle at 42% 38%, #FFF3CC 0 1.4px, #D6B26A 2.6px, #8E6C2E 3.6px, transparent 4px) 0 0/9px 12px repeat-x}
+.valance{position:absolute;top:0;left:0;right:0;height:84px;z-index:3;background:linear-gradient(#E7DCC7,#E7DCC7) 0 0/100% 8px no-repeat}
+.valance svg{width:100%;height:100%;display:block}
+.gate .intro{z-index:4;margin-bottom:auto;margin-top:22vh;transition:opacity .6s}
+.gate .script{font-size:2.6rem}
+.gate h2{color:var(--ink);font-weight:300}
+.medal{position:relative;z-index:4;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:var(--tile) 0 0/6px 6px;box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--lemon),0 0 0 8px var(--paper),0 0 0 9px var(--stitch),0 16px 30px -12px rgba(74,52,38,.55);
+  outline:1.5px dashed var(--stitch);outline-offset:-9px;transition:transform .5s cubic-bezier(.3,1.5,.5,1), opacity .5s}
+.medal::before{content:"";position:absolute;inset:-14px;border-radius:50%;background:var(--bead) 0 0/9px 9px;
+  -webkit-mask:radial-gradient(circle, transparent 60%, #000 61%, #000 70%, transparent 71%);mask:radial-gradient(circle, transparent 60%, #000 61%, #000 70%, transparent 71%)}
+.medal span{font-family:var(--script);font-size:1.75rem;color:var(--ink);padding:0 .15em;margin-top:4px}
+@media (prefers-reduced-motion:no-preference){.gate:not(.cracking) .medal{animation:breathe 2.4s ease-in-out infinite}}
+.gate.cracking .medal{transform:scale(.88)}
+.gate.broken .medal{transform:scale(1.4);opacity:0}
+.gate.flap-open .drape.l{transform:translateX(-40%) scaleX(.36)}
+.gate.flap-open .drape.r{transform:translateX(40%) scaleX(.36)}
+.gate.flap-open .tie{opacity:1}
+.gate.letter-out .behind{transform:scale(1.05)}
+.gate.letter-out .env{transform:none}
+.gate .hint{z-index:4;color:var(--muted)}
+.gate .hint svg{color:var(--gold)}
+.gate:focus-visible .medal{outline-color:var(--ink)}
+.gate.cracking .intro{opacity:0}
+
+/* ---------- hero ---------- */
+.hero{padding-block:10px 18px}
+.ea-hero{display:flex;flex-direction:column;align-items:center}
+.chandelier{width:220px;max-width:70%;margin-bottom:-46px;position:relative;z-index:2}
+.chandelier svg{width:100%;height:auto;display:block}
+.card{position:relative;width:100%;background:var(--tile) 0 0/6px 6px;border-radius:28px;padding:66px 22px 34px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  box-shadow:0 0 0 1px var(--line),0 30px 60px -36px rgba(74,52,38,.5);outline:1.5px dashed var(--stitch);outline-offset:-11px}
+.eyebrow{color:var(--gold-lo);letter-spacing:.26em;font-weight:500}
+.script-names{font-size:1.8rem;margin:-2px 0 -8px}
+.names{font-weight:300;color:var(--ink);font-size:clamp(2.7rem,12.5vw,4.6rem)}
+.names .amp{font-size:.62em}
+.stitch-rule{width:150px;height:10px;background:var(--bead) 0 0/10px 10px repeat-x}
+.date{font-family:var(--latin)}
+.date .n{font-size:2.7rem}
+.date .dot{width:8px;height:8px;border-radius:50%;transform:none;background:var(--lemon)}
+.where{color:var(--muted)}
+.where svg{color:var(--gold)}
+.lead{color:var(--muted)}
+.btn.solid{background:var(--ink);color:var(--paper);box-shadow:0 12px 24px -12px rgba(58,42,28,.6)}
+.btn.solid:hover{background:#5B4331}
+.btn.ghost{background:var(--paper);color:var(--ink);border-color:var(--ink)}
+.btn.ghost:hover{background:var(--sky)}
+
+/* ---------- garlands, headings ---------- */
+.garland-band{height:66px;margin-top:6px}
+.garland-band svg{width:100%;height:100%;display:block}
+.head .script{font-size:2.3rem}
+.head h2{color:var(--ink);font-weight:400}
+.window-art{width:118px;margin:0 auto 4px}
+.window-art svg{width:100%;height:auto;display:block}
+
+/* countdown */
+.count > div{aspect-ratio:.86;padding:0;background:var(--paper);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 14px 26px -18px rgba(74,52,38,.5)}
+.count span{background:none;border-radius:13px;box-shadow:none;outline:1.2px dashed var(--stitch);outline-offset:-6px}
+.count b{font-family:var(--latin);font-style:italic;color:var(--ink)}
+.count small{color:var(--muted)}
+
+/* schedule */
+.stop{background:var(--paper);border-radius:28px;box-shadow:0 0 0 1px var(--line),0 26px 50px -36px rgba(74,52,38,.5)}
+.scene{border-radius:170px 170px 16px 16px;box-shadow:0 0 0 6px var(--paper),0 0 0 7px var(--stitch);outline:1.5px dashed var(--stitch);outline-offset:-10px}
+.scene.art{background:var(--tile) 0 0/6px 6px;aspect-ratio:400/300}
+.ill{position:absolute;inset:0;display:grid;place-items:center}
+.ill i{display:none}
+.ill svg{width:30%;height:30%;color:var(--ink)}
+.scene.art::before{content:"";position:absolute;inset:22%;border-radius:50%;background:var(--bead) 0 0/10px 10px;
+  -webkit-mask:radial-gradient(circle, transparent 64%, #000 65%, #000 72%, transparent 73%);mask:radial-gradient(circle, transparent 64%, #000 65%, #000 72%, transparent 73%)}
+.badge{color:var(--ink);box-shadow:0 0 0 1px var(--line),0 8px 16px -8px rgba(74,52,38,.5);background:rgba(251,247,238,.95)}
+.badge .ic{background:var(--ink);color:var(--gold-hi)}
+.info h3{color:var(--ink)}
+.map{color:var(--ink);border-color:var(--ink)}
+.map:hover{background:var(--ink);color:var(--paper)}
+.link{color:var(--gold)}
+@media (prefers-reduced-motion:no-preference){
+  .twinkle{animation:twinkle 2.8s ease-in-out infinite alternate}
+  .glow{animation:twinkle 1.6s ease-in-out infinite alternate}
+}
+
+/* dress code + wishes */
+.dress,.wishes{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;background:var(--tile) 0 0/6px 6px;border-radius:28px;
+  padding:34px 22px 32px;box-shadow:0 0 0 1px var(--line),0 26px 50px -36px rgba(74,52,38,.5);outline:1.5px dashed var(--stitch);outline-offset:-11px}
+.dress .script,.wishes .script{font-family:var(--script);font-size:2.2rem;line-height:1.2;padding:0 .2em}
+.dress h2,.wishes h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(1.45rem,5vw,1.85rem);color:var(--ink)}
+.dress-text{margin:2px 0 6px;font-family:var(--display);font-size:1.15rem}
+.swatches{display:flex;gap:12px}
+.swatches span{width:38px;height:38px;border-radius:50%;box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--stitch)}
+.dress-note,.wish-sub{margin:6px 0 0;color:var(--muted);font-size:.92rem;max-width:34ch}
+.env-art{width:min(100%,290px);margin:6px 0}
+.env-art svg{width:100%;height:auto;display:block}
+@media (prefers-reduced-motion:no-preference){.wishes.in .env-art{animation:pop .9s cubic-bezier(.3,1.5,.5,1) both}}
+.wishes .textarea{max-width:440px}
+.wishes .btn{margin-top:6px}
+
+/* rsvp */
+.rsvp{background:var(--tile) 0 0/6px 6px;border-radius:28px;box-shadow:0 0 0 1px var(--line),0 30px 60px -38px rgba(74,52,38,.55)}
+.rsvp::before{border:1.5px dashed var(--stitch);border-radius:20px}
+.input,.textarea{background:#FFFDF8;border-color:var(--line)}
+.input:focus,.textarea:focus{border-color:var(--ink);box-shadow:0 0 0 4px rgba(74,52,38,.12)}
+.choice label{background:#FFFDF8;border-color:var(--line)}
+.choice label svg{color:var(--gold-lo)}
+.choice input:checked + label{background:var(--sky);border-color:var(--ink);color:var(--ink)}
+.stepper button{color:var(--ink);border-color:var(--line)}
+.stepper output{color:var(--ink)}
+.submit{background:var(--ink)}
+.submit:hover{background:#5B4331}
+.done .tilebadge{border-radius:50%;box-shadow:0 0 0 1px var(--stitch)}
+.done .tilebadge span{color:var(--ink)}
+.done h3{color:var(--ink)}
+.copy{color:var(--ink);border-color:var(--ink)!important}
+
+/* footer, controls */
+.foot{background:linear-gradient(180deg,var(--wash),#EADFCA);color:var(--ink)}
+.foot .garland-band{margin-top:0}
+.foot .when{color:var(--muted)}
+.foot .brand{color:var(--muted)}
+.music{background:var(--ink);color:var(--gold-hi);box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--stitch),0 12px 24px -10px rgba(58,42,28,.6)}
+.lang{background:rgba(251,247,238,.95);box-shadow:0 0 0 1px var(--line),0 8px 18px -10px rgba(58,42,28,.5)}
+.lang button{color:var(--ink)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--gold-hi)}
+.progress{background:var(--goldfoil)}

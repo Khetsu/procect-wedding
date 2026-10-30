@@ -1,0 +1,59 @@
+<!doctype html><html lang="ka"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@300;400;500;600&family=Italianno&family=Ballet:opsz@16..72&family=Allison&family=Rouge+Script&family=Herr+Von+Muellerhoff&family=Monsieur+La+Doulaise&family=Cormorant+Garamond:ital,wght@1,500&display=swap">
+<style>
+/* ამბავი · პრემიუმ დიზაინები — პოსტები 1080x1350: ?d=liquid-gold|aurora|galaxy|fireworks|silk|vitrage|cover */
+html,body{margin:0}
+body{width:1080px;height:1350px;overflow:hidden;position:relative;font-family:"Noto Serif Georgian",serif;color:#F7F1E6;background:#050403}
+.bg{position:absolute;inset:-60px;background:center/cover no-repeat;filter:blur(38px) brightness(.38) saturate(1.2);transform:scale(1.1)}
+.vig{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 45%,transparent 30%,rgba(0,0,0,.75))}
+.frame{position:absolute;inset:26px;border:1px solid rgba(231,198,138,.38)}
+.frame:after{content:"";position:absolute;inset:8px;border:1px solid rgba(231,198,138,.16)}
+.top{position:absolute;top:62px;left:70px;right:70px;display:flex;justify-content:space-between;align-items:center;font:500 18px/1 "Noto Serif Georgian";letter-spacing:.46em;color:#E7C68A}
+.top i{font:italic 500 24px/1 "Cormorant Garamond";letter-spacing:.12em;color:rgba(247,241,230,.75)}
+.ph{position:absolute;border-radius:44px;overflow:hidden;background:#000 center/cover no-repeat;box-shadow:0 0 0 2px rgba(255,255,255,.16),0 0 0 11px #0b0a09,0 0 0 12.5px rgba(231,198,138,.45),0 60px 110px -30px rgba(0,0,0,.9),0 0 140px -20px var(--gl)}
+.ph b{position:absolute;left:0;right:0;bottom:0;padding:70px 10px 22px;text-align:center;font:500 20px/1.2 "Noto Serif Georgian";letter-spacing:.18em;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.txt{position:absolute;left:676px;right:70px;top:230px}
+.n{font:italic 500 110px/1 "Cormorant Garamond";color:rgba(231,198,138,.3)}
+.kind{margin-top:10px;font:500 16px/1.5 "Noto Serif Georgian";letter-spacing:.28em;color:#E7C68A}
+h1{margin:20px 0 4px;font:500 54px/1.12 "Noto Serif Georgian"}
+.sc{margin-top:10px;font:400 62px/1.1 var(--fs);color:var(--acc)}
+.line{width:90px;height:2px;margin:28px 0;background:linear-gradient(90deg,#E7C68A,transparent)}
+.open{font:300 22px/1.6 "Noto Serif Georgian";color:rgba(247,241,230,.86)}
+.feat{display:grid;gap:14px;font:400 18px/1.35 "Noto Serif Georgian";color:rgba(247,241,230,.82)}
+.feat span{display:flex}.feat span:before{content:"✦";margin-right:12px;color:#E7C68A}
+.cta{position:absolute;bottom:64px;left:0;right:0;text-align:center;font:500 24px/1 "Noto Serif Georgian";letter-spacing:.06em;color:#E7C68A}
+.cv h1{position:absolute;top:116px;left:0;right:0;margin:0;text-align:center;font:600 82px/1.05 "Noto Serif Georgian";letter-spacing:.03em;background:linear-gradient(180deg,#FFF4DA,#D9AE62 70%,#A8803E);-webkit-background-clip:background-clip;-webkit-background-clip:text;color:transparent}
+.cv .sub{position:absolute;top:222px;left:0;right:0;text-align:center;font:italic 500 38px/1 "Cormorant Garamond";letter-spacing:.2em;color:rgba(247,241,230,.8)}
+.cv .tag{position:absolute;top:1128px;left:80px;right:80px;text-align:center;font:300 24px/1.55 "Noto Serif Georgian";color:rgba(247,241,230,.88)}
+</style></head><body><div id="r"></div>
+<script>
+const D = {
+  "liquid-gold": { n: "I", name: "თხევადი ოქრო", sc: "Liquid Gold", fs: "'Italianno'", acc: "#E9C98A", gl: "rgba(233,190,110,.55)", kind: "ქორწილი · BLACK TIE", open: "ოქროს წვეთები იშლება, ერთმანეთს ერწყმის და ბრწყინვალე ბეჭდად იქცევა — შიგ თქვენი სახელებით.", o: "o4" },
+  "aurora": { n: "II", name: "ჩრდილოეთის ციალი", sc: "Aurora", fs: "'Ballet'", acc: "#8FF0CE", gl: "rgba(60,230,170,.45)", kind: "ნიშნობა · ზამთრის ქორწილი", open: "მთებსა და გაყინულ ტბაზე ცა ნელ-ნელა ინთება ზურმუხტისფერი და იისფერი ციალით.", o: "o5" },
+  "galaxy": { n: "III", name: "გალაქტიკა", sc: "Two Stars", fs: "'Allison'", acc: "#E3C6FF", gl: "rgba(170,130,255,.5)", kind: "ქორწილი · ღია ცის ქვეშ", open: "ორი ვარსკვლავი ერთმანეთის გარშემო ტრიალებს, ერწყმის და ახალ გალაქტიკას შობს.", o: "o5" },
+  "fireworks": { n: "IV", name: "ფეიერვერკი", sc: "Grand Night", fs: "'Rouge Script'", acc: "#FFD35A", gl: "rgba(255,90,160,.45)", kind: "იუბილე · კორპორატიული გალა", open: "ღამის ქალაქზე რაკეტა ადის და დიდ გულად სკდება — მერე ცა ფერად ზეიმად იქცევა.", o: "o4" },
+  "silk": { n: "V", name: "აბრეშუმი", sc: "Silk & Light", fs: "'Herr Von Muellerhoff'", acc: "#F3D3BE", gl: "rgba(240,200,175,.4)", kind: "ქორწილი · ნაზი ტონები", open: "სიბნელეში სინათლის ზოლი გადაუვლის ეკრანს და მოძრავი აბრეშუმის ნაკეცებს აჩენს.", o: "o5" },
+  "vitrage": { n: "VI", name: "ვიტრაჟი", sc: "Holy Light", fs: "'Monsieur La Doulaise'", acc: "#E8C27A", gl: "rgba(240,180,80,.45)", kind: "ჯვრისწერა · ნათლობა", open: "ტაძრის ვარდისებრი ვიტრაჟი რგოლ-რგოლ ინთება და ფერადი სინათლის სხივები ეცემა.", o: "o5" }
+};
+const P = new URLSearchParams(location.search), d = P.get("d") || "cover", R = document.getElementById("r"), img = s => `url(../frames/hp/${s}.jpg)`;
+const feat = ["ცოცხალი გახსნა — დააჭირეთ და გააჩერეთ", "საკუთარი მუსიკა და უკუთვლა", "პროგრამა, რუკა და დრეს-კოდი", "დადასტურება ერთი ღილაკით"];
+const head = `<div class="frame"></div><div class="top"><span>ამბავი</span><i>Premium Collection</i></div>`;
+if (d === "cover"){
+  document.body.classList.add("cv");
+  R.innerHTML = `<div class="bg" style="background-image:${img("galaxy-hero")}"></div><div class="vig"></div>` + head +
+    `<h1>პრემიუმ დიზაინები</h1><div class="sub">six grand openings</div>` +
+    Object.entries(D).map(([k, v], i) => { const col = i % 3, row = (i / 3) | 0;
+      return `<div class="ph" style="--gl:${v.gl};left:${112 + col * 304}px;top:${300 + row * 404}px;width:236px;height:380px;border-radius:30px;background-image:${img(k + "-" + v.o)}"><b>${v.name}</b></div>`; }).join("") +
+    `<div class="tag">ექვსი სრულიად ახალი, ცოცხალი გახსნა — ოქრო, ციალი, გალაქტიკა,<br>ფეიერვერკი, აბრეშუმი და ვიტრაჟი</div><div class="cta">შეუკვეთეთ თქვენი მოსაწვევი ✨</div>`;
+} else {
+  const v = D[d]; document.body.style.setProperty("--fs", v.fs); document.body.style.setProperty("--acc", v.acc);
+  R.innerHTML = `<div class="bg" style="background-image:${img(d + "-hero")}"></div><div class="vig"></div>` + head +
+    `<div class="ph" style="--gl:${v.gl};left:92px;top:190px;width:440px;height:952px;background-image:${img(d + "-hero")}"><b>თქვენი გვერდი</b></div>` +
+    `<div class="ph" style="--gl:${v.gl};left:440px;top:830px;width:180px;height:370px;border-radius:26px;background-image:${img(d + "-" + v.o)}"><b style="font-size:14px;padding:40px 4px 12px">გახსნა</b></div>` +
+    `<div class="txt"><div class="n">${v.n}</div><div class="kind">${v.kind}</div><h1>${v.name}</h1><div class="sc">${v.sc}</div><div class="line"></div><div class="open">${v.open}</div></div>` +
+    `<div class="txt" style="top:930px"><div class="feat">${feat.map(f => `<span>${f}</span>`).join("")}</div></div>` +
+    `<div class="cta">შეუკვეთეთ თქვენი მოსაწვევი ✨</div>`;
+}
+document.fonts.ready.then(() => { const t = document.querySelector(".txt h1"); if (t){ let z = 54; while (t.scrollWidth > t.clientWidth && z > 34){ z -= 2; t.style.fontSize = z + "px"; } } });
+Promise.all([document.fonts.ready, ...[...document.querySelectorAll("[style*=url]")].map(e => new Promise(r => { const i = new Image(); i.onload = i.onerror = r; i.src = e.style.backgroundImage.slice(5, -2); }))]).then(() => setTimeout(() => window.__ready = true, 400));
+</script></body></html>

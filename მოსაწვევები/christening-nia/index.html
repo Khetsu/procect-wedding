@@ -1,0 +1,133 @@
+<!doctype html>
+<!-- ამბავი · ნათლობის მოსაწვევი „christening-nia“ — დიზაინი „ყვავილოვანი ბაღი“
+     გახსნა: 3D კონვერტი ბეჭდით (js/envelope3d.js). ტექსტები: js/config.js · სტილი: css/theme.css
+     ყვავილების ტოტები (images/canopy.png) 3D-ში დახატულია ამ დიზაინისთვის. -->
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ნიას ნათლობა · მოსაწვევი</title>
+<meta name="description" content="ნიას ნათლობა · 16 მაისი 2027, თბილისი">
+<meta name="theme-color" content="#F7F1E3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Great+Vibes&family=Montserrat:wght@400;500&family=Noto+Serif+Georgian:wght@300;400;500&family=Noto+Sans+Georgian:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/theme.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+
+<!-- ============ GATE ============ -->
+<div class="gate" id="gate" role="button" tabindex="0" aria-label="მოსაწვევის გახსნა" data-stages="s1:0,s2:2600" data-open="3300" data-burst="450:petals::40" hidden>
+  <img class="g-can top" src="images/canopy.png" alt="" aria-hidden="true">
+  <img class="g-can bot" src="images/canopy.png" alt="" aria-hidden="true">
+  <p class="g-top"><span class="g-script">Nia</span><span class="g-sub" data-t="label"></span></p>
+  <div class="g-fallback" aria-hidden="true"><div class="gf-env"><div class="gf-flap"></div><div class="gf-seal" data-t="monogram"></div></div></div>
+  <p class="g-hint"><svg><use href="#i-heart"/></svg><span data-i18n="tapHint"></span></p>
+</div>
+<script>try{document.getElementById("gate").hidden=false;document.documentElement.classList.add("gated")}catch(e){}</script>
+
+<main class="col">
+  <!-- ============ HERO: a garden of blossom with the name label ============ -->
+  <header class="hero">
+    <img class="can top hx" style="--hx:hx-fade;--d:.2" src="images/canopy.png" alt="" aria-hidden="true">
+    <img class="can bot hx" style="--hx:hx-fade;--d:.4" src="images/canopy.png" alt="" aria-hidden="true">
+    <div class="sun" aria-hidden="true"></div>
+    <div class="label hx" style="--d:.8">
+      <p class="l-caps" data-t="label"></p>
+      <p class="l-script">Nia</p>
+      <p class="l-verse" data-t="verse"></p>
+    </div>
+  </header>
+
+  <!-- ============ DATE + calendar ============ -->
+  <section class="sec center">
+    <h2 class="cap-title" data-anim="up" data-i18n="dateTitle"></h2>
+    <p class="big-date" data-anim="up" data-t="dots"></p>
+    <div class="cal" id="calendar" data-anim="up"></div>
+    <h2 class="cap-title mt" data-anim="up" data-i18n="placeTitle"></h2>
+    <p class="place" data-anim="up" data-t="place"></p>
+    <p class="addr" data-anim="up" data-t="placeAddr"></p>
+    <a class="btn pill js-map" href="#" target="_blank" rel="noopener" data-anim="up"><svg><use href="#i-pin"/></svg><span data-i18n="mapBtn"></span></a>
+  </section>
+
+  <img class="band" src="images/canopy.png" alt="" aria-hidden="true">
+
+  <!-- ============ TIMELINE in a blush arch ============ -->
+  <section class="tl-wrap" data-section="events">
+    <div class="tl-panel">
+      <h2 class="cap-title" data-anim="up" data-i18n="dayTitle"></h2>
+      <div class="tl">
+        <svg class="tl-h top" aria-hidden="true"><use href="#i-heart"/></svg>
+        <ol id="day"></ol>
+        <svg class="tl-h bot" aria-hidden="true"><use href="#i-heart"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <img class="band flip" src="images/canopy.png" alt="" aria-hidden="true">
+
+  <!-- ============ THE LITTLE ONE + godparents ============ -->
+  <section class="sec center">
+    <figure class="baby" data-anim="zoom"><div class="baby-photo kb" data-photo="babyPhoto"></div></figure>
+    <p class="text" data-anim="up" data-t="lead"></p>
+    <h2 class="cap-title mt" data-anim="up" data-i18n="godTitle"></h2>
+    <div class="gods" id="details"></div>
+  </section>
+
+  <!-- ============ COUNTDOWN ============ -->
+  <section class="sec center soft">
+    <h2 class="cap-title" data-anim="up" data-i18n="cdTitle"></h2>
+    <div class="count" id="count" data-anim="up"></div>
+    <div class="ctas" data-anim="up" data-ctas></div>
+  </section>
+
+  <!-- ============ RSVP ============ -->
+  <section class="sec" id="rsvp">
+    <h2 class="cap-title center" data-anim="up" data-i18n="rsvpTitle"></h2>
+    <div class="rsvp" id="rsvp-box" data-anim="up"></div>
+  </section>
+
+  <!-- ============ FOOTER: garden again ============ -->
+  <footer class="foot">
+    <img class="can top" src="images/canopy.png" alt="" aria-hidden="true">
+    <div class="f-in">
+      <p class="l-caps" data-i18n="withLove"></p>
+      <p class="f-names" data-t="parents"></p>
+      <p class="l-caps" data-t="dots"></p>
+    </div>
+  </footer>
+</main>
+
+<template id="tpl-event"><li class="ev" data-anim="up"><p class="ev-time" data-f="time"></p><p class="ev-title" data-f="title"></p><p class="ev-note" data-f="note"></p><i class="ev-dot"><svg><use href="#i-heart"/></svg></i></li></template>
+<template id="tpl-detail"><div class="god" data-anim="up"><svg data-f="icon"><use href="#i-heart"/></svg><p class="g-l" data-f="label"></p><p class="g-v" data-f="value"></p></div></template>
+
+<script src="js/config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/music.js"></script>
+<script src="js/core.js"></script>
+<script>
+/* the month calendar with a heart on the day, and the map button */
+(function(){ var C = window.CONFIG, p = String(C.date).split("-").map(Number), Y = p[0], M = p[1], D = p[2];
+  var en = document.documentElement.lang === "en";
+  var MK = ["იანვარი","თებერვალი","მარტი","აპრილი","მაისი","ივნისი","ივლისი","აგვისტო","სექტემბერი","ოქტომბერი","ნოემბერი","დეკემბერი"], ME = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var WK = ["ორ","სა","ოთ","ხუ","პა","შა","კვ"], WE = ["Mo","Tu","We","Th","Fr","Sa","Su"];
+  function draw(){ en = document.documentElement.lang === "en";
+    var first = (new Date(Y, M - 1, 1).getDay() + 6) % 7, days = new Date(Y, M, 0).getDate(), h = '<p class="c-m">' + (en ? ME : MK)[M - 1] + " " + Y + '</p><div class="c-g">';
+    (en ? WE : WK).forEach(function(w){ h += '<b>' + w + '</b>'; });
+    for (var i = 0; i < first; i++) h += "<span></span>";
+    for (var d = 1; d <= days; d++) h += d === D ? '<span class="on"><svg><use href="#i-heart"/></svg><em>' + d + '</em></span>' : "<span>" + d + "</span>";
+    document.getElementById("calendar").innerHTML = h + "</div>"; }
+  draw(); document.querySelectorAll("[data-lang]").forEach(function(b){ b.addEventListener("click", function(){ setTimeout(draw, 0); }); });
+  /* no baby photo yet: hide the frame until images/baby.jpg is added */
+  setTimeout(function(){ var f = document.querySelector(".baby"); if (f && !f.querySelector(".photo.has")) f.hidden = true; }, 2500);
+  var q = C.placeMap || ""; document.querySelectorAll(".js-map").forEach(function(a){ a.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q); });
+})();
+</script>
+<script src="js/envelope3d.js"></script>
+</body>
+</html>

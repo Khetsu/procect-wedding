@@ -1,0 +1,36 @@
+{
+ "song": "chiptune",
+ "adelay": 2.9,
+ "theme": {
+  "bg1": "#3A1C6E",
+  "bg2": "#0B0A2E",
+  "ink": "#FFFFFF",
+  "acc": "#FFD36E"
+ },
+ "segs": [
+  {
+   "type": "pov",
+   "dir": "v-planets",
+   "dur": 2.5,
+   "from_": "ლუკა 🚀",
+   "msg": "გეპატიჟება დაბადების დღეზე!"
+  },
+  {
+   "type": "clip",
+   "dir": "v-planets",
+   "from": 1,
+   "dur": 6.4,
+   "speed": 0.9,
+   "tap": 0.45,
+   "tr": "zoom",
+   "trd": 0.35
+  }
+ ],
+ "cover": {
+  "dir": "v-planets",
+  "idx": 112,
+  "kicker": "POV",
+  "title": "შენ მიიღე\nმოსაწვევი 💌",
+  "sub": "▶ ნახე, როგორ იხსნება"
+ }
+}

@@ -1,0 +1,194 @@
+{
+ "song": "pulse",
+ "segs": [
+  {
+   "type": "clip",
+   "dir": "w-champagne",
+   "from": 3.2,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "შამპანურის კოშკი",
+   "labelY": 1660,
+   "count": "01 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-planets",
+   "from": 3.4,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "პლანეტები",
+   "labelY": 1660,
+   "count": "02 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "w-chapel",
+   "from": 3.6,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "სანთლების ტაძარი",
+   "labelY": 1660,
+   "count": "03 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-bottle",
+   "from": 3.3,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "ბოთლი ზღვაში",
+   "labelY": 1660,
+   "count": "04 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "w-rings",
+   "from": 3.6,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "ბეჭდები",
+   "labelY": 1660,
+   "count": "05 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-vinyl",
+   "from": 3,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "ვინილი",
+   "labelY": 1660,
+   "count": "06 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "w-veil",
+   "from": 2.6,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "ფატა",
+   "labelY": 1660,
+   "count": "07 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-snow-globe",
+   "from": 2.4,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "თოვლის გლობუსი",
+   "labelY": 1660,
+   "count": "08 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "w-cake",
+   "from": 2.8,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "საქორწილო ტორტი",
+   "labelY": 1660,
+   "count": "09 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-curtain",
+   "from": 3,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "ფარდა",
+   "labelY": 1660,
+   "count": "10 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-moon-lake",
+   "from": 3.2,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "მთვარის ტბა",
+   "labelY": 1660,
+   "count": "11 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-cranes",
+   "from": 3.2,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "წეროები",
+   "labelY": 1660,
+   "count": "12 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-vineyard",
+   "from": 3,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "ვენახი",
+   "labelY": 1660,
+   "count": "13 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-balloons",
+   "from": 3.2,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "საჰაერო ბუშტები",
+   "labelY": 1660,
+   "count": "14 / 15"
+  },
+  {
+   "type": "clip",
+   "dir": "v-flower-arch",
+   "from": 2.6,
+   "dur": 1.0169491525423728,
+   "speed": 1.25,
+   "punch": true,
+   "label": "ყვავილების თაღი",
+   "labelY": 1660,
+   "count": "15 / 15"
+  },
+  {
+   "type": "card",
+   "dur": 2.0338983050847457,
+   "title": "რომელი\nდაგამახსოვრდა? 👇",
+   "sub": "დაწერე კომენტარში",
+   "tr": "flash",
+   "trd": 0.25
+  }
+ ],
+ "texts": [
+  {
+   "from": 0,
+   "to": 2,
+   "text": "15 გახსნა — 15 წამში ⚡",
+   "y": 560,
+   "size": 64
+  }
+ ],
+ "cover": {
+  "dir": "v-planets",
+  "idx": 112,
+  "kicker": "⚡ ამბავი",
+  "title": "15 გახსნა\n15 წამში",
+  "sub": "რომელი დაგამახსოვრდა? 👇"
+ }
+}

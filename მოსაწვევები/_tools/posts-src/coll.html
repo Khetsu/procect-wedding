@@ -1,0 +1,51 @@
+<!doctype html><html lang="ka"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Serif+Georgian:wght@300;400;500;600&family=Pinyon+Script&family=Tangerine:wght@700&family=Poiret+One&family=Sacramento&family=Satisfy&family=Monoton&family=Great+Vibes&family=Parisienne&family=Allura&family=Fredoka:wght@500;600&display=swap">
+<style>
+/* ამბავი · ახალი კოლექცია 10/25 — პოსტები 1080x1350: ?d=moon-lake|vineyard|curtain|cranes|bottle|vinyl|cover */
+html,body{margin:0}
+body{width:1080px;height:1350px;overflow:hidden;position:relative;font-family:"Noto Serif Georgian",serif;color:var(--ink);background:radial-gradient(110% 75% at 50% 40%,var(--b1),var(--b2))}
+.glow{position:absolute;left:50%;top:640px;width:1100px;height:1100px;margin:-550px 0 0 -550px;border-radius:50%;background:radial-gradient(closest-side,var(--gl),transparent)}
+.top{position:absolute;top:50px;left:60px;right:60px;display:flex;justify-content:space-between;font:500 19px/1 "Noto Serif Georgian";letter-spacing:.42em;color:var(--mut)}
+.top span:last-child{letter-spacing:.14em}
+h1{position:absolute;top:112px;left:40px;right:40px;margin:0;text-align:center;font:500 74px/1.1 "Noto Serif Georgian"}
+.sc{position:absolute;top:208px;left:0;right:0;text-align:center;font:400 52px/1.1 var(--fs);color:var(--acc)}
+.sub{position:absolute;top:286px;left:60px;right:60px;text-align:center;font:400 22px/1.45 "Noto Serif Georgian";color:var(--mut)}
+.ph{position:absolute;border-radius:32px;overflow:hidden;background:#000 center/cover no-repeat;box-shadow:0 0 0 2px rgba(255,255,255,.22),0 50px 90px -30px rgba(0,0,0,.65)}
+.ph span{position:absolute;left:0;right:0;bottom:0;padding:54px 8px 18px;text-align:center;font:500 21px/1.2 "Noto Serif Georgian";color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.chips{position:absolute;left:50px;right:50px;top:1132px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 12px}
+.chips span{padding:11px 18px;border-radius:30px;font:400 18px/1 "Noto Serif Georgian";color:var(--ink);background:rgba(255,255,255,.09);box-shadow:inset 0 0 0 1px var(--line)}
+.cta{position:absolute;bottom:48px;left:0;right:0;text-align:center;font:500 23px/1 "Noto Serif Georgian";color:var(--acc)}
+.light .chips span{background:rgba(255,255,255,.55)}
+</style></head><body><div id="r"></div>
+<script>
+const D = {
+  "moon-lake": { n: "01", name: "მთვარის ტბა", sc: "Moonlit Lake", fs: "'Pinyon Script'", kind: "ქორწილი", open: "ტბაზე ლოტოსი იშლება და ციცინათელები ამოფრინდებიან", c: ["#1E2260", "#05061A", "#F4F1FA", "rgba(232,228,250,.72)", "#E9D3A0", "rgba(150,140,255,.25)", "rgba(220,215,255,.25)"], f: ["0030", "0100", "0200"], cap: ["მოსაწვევი ელოდება", "ლოტოსი იშლება", "თქვენი გვერდი"], song: "ღამის ჯაზი" },
+  "vineyard": { n: "02", name: "ვენახი", sc: "Golden Vineyard", fs: "'Tangerine'", kind: "ქართული ქორწილი", open: "ქვევრს თავსახური ეხდება და ვაზის ფოთლები ოქროს შუქში ამოდის", c: ["#8A4430", "#1E0F0B", "#FFF6EA", "rgba(255,240,222,.75)", "#F3C680", "rgba(255,190,110,.3)", "rgba(255,220,180,.25)"], f: ["0030", "0110", "0205"], cap: ["ოქროს საათი", "ქვევრი იხსნება", "თქვენი გვერდი"], song: "ჩონგური" },
+  "curtain": { n: "03", name: "ფარდა", sc: "Grand Gala", fs: "'Poiret One'", kind: "გალა · იუბილე · კორპორატიული", open: "ხავერდის ფარდა იხსნება და ნათურებით აინთება „10“", c: ["#4A0E18", "#060203", "#FBF2E4", "rgba(251,236,214,.72)", "#E8C77E", "rgba(255,170,90,.22)", "rgba(255,210,170,.25)"], f: ["0030", "0105", "0200"], cap: ["სცენა მზადაა", "ფარდა იხსნება", "თქვენი გვერდი"], song: "ჯაზ-ლაუნჯი" },
+  "cranes": { n: "04", name: "წეროები", sc: "Paper Cranes", fs: "'Sacramento'", kind: "ნათლობა · ბავშვის დაბადება", open: "ქაღალდის წეროები გულს აწყობენ და ცაში იფანტებიან", c: ["#F7E7EF", "#DCE6F6", "#4A3F57", "rgba(74,63,87,.7)", "#C9839F", "rgba(255,255,255,.6)", "rgba(150,120,170,.3)"], f: ["0030", "0105", "0200"], cap: ["წეროების გუნდი", "წეროების გული", "თქვენი გვერდი"], song: "ჰარპა", light: true },
+  "bottle": { n: "05", name: "ბოთლი ზღვაში", sc: "Message in a Bottle", fs: "'Satisfy'", kind: "ნიშნობა · ზღვისპირა ქორწილი", open: "ბოთლს საცობი ძვრება და წერილი სახელებით იშლება", c: ["#8A4A8E", "#14112E", "#FFF5EC", "rgba(255,238,226,.75)", "#FFC38A", "rgba(255,150,110,.3)", "rgba(255,210,190,.25)"], f: ["0030", "0120", "0205"], cap: ["ბოთლი ტალღებზე", "წერილი იშლება", "თქვენი გვერდი"], song: "ზღვა · უკულელე" },
+  "vinyl": { n: "06", name: "ვინილი", sc: "Saba · 30", fs: "'Monoton'", kind: "დაბადების დღე · წვეულება", open: "ფირფიტაზე ნემსი ეშვება და ნეონი ბითზე ფეთქავს", c: ["#4A1270", "#07021A", "#FFF2FF", "rgba(255,228,250,.74)", "#FF6CC8", "rgba(255,80,200,.25)", "rgba(255,120,220,.3)"], f: ["0030", "0100", "0200"], cap: ["ფირსაკრავი", "ნემსი ეშვება", "თქვენი გვერდი"], song: "სინთვეივი" },
+  "snow-globe": { n: "07", name: "თოვლის გლობუსი", sc: "Winter Wonderland", fs: "'Great Vibes'", kind: "ზამთრის ქორწილი · საახალწლო", open: "გლობუსი ირყევა, შიგნით თოვლი ტრიალებს და სოფელი ნათდება", c: ["#24426E", "#060E1E", "#F3F7FF", "rgba(225,235,250,.75)", "#E6C47E", "rgba(150,190,255,.25)", "rgba(200,220,255,.25)"], f: ["0030", "0100", "0205"], cap: ["თოვლიანი ღამე", "გლობუსი ირყევა", "თქვენი გვერდი"], song: "ზამთარი · ეჟვნები" },
+  "flower-arch": { n: "08", name: "ყვავილების თაღი", sc: "Garden Ceremony", fs: "'Parisienne'", kind: "ქორწილი ბაღში · ნიშნობა", open: "თაღზე ვარდები იშლება, ფურცლები ცვივა და ბილიკზე გადიხართ", c: ["#F4F0E6", "#DCE8D6", "#34402C", "rgba(52,64,44,.72)", "#B9707F", "rgba(255,255,255,.6)", "rgba(90,110,70,.28)"], f: ["0030", "0100", "0200"], cap: ["მწვანე თაღი", "ვარდები იშლება", "თქვენი გვერდი"], song: "ბაღი · გიტარა და ფლეიტა", light: true },
+  "balloons": { n: "09", name: "საჰაერო ბუშტები", sc: "Up & Away", fs: "'Allura'", kind: "ბოჰო ქორწილი · იუბილე", open: "სანთურა ინთება და ბუშტი თქვენი სახელებით ცაში ადის", c: ["#F6D8C6", "#E6D6EA", "#3E2E44", "rgba(62,46,68,.72)", "#C0644E", "rgba(255,255,255,.55)", "rgba(120,80,110,.28)"], f: ["0030", "0100", "0200"], cap: ["განთიადი", "აფრენა", "თქვენი გვერდი"], song: "ბოჰო რუმბა", light: true },
+  "planets": { n: "10", name: "პლანეტები", sc: "Space Party", fs: "'Fredoka'", kind: "საბავშვო დაბადების დღე", open: "3·2·1 — რაკეტა აფრინდება და დაბადების დღის პლანეტამდე მიფრინავს", c: ["#3A1C6E", "#0B0A2E", "#FFFFFF", "rgba(230,222,255,.78)", "#FFD36E", "rgba(160,120,255,.3)", "rgba(200,180,255,.3)"], f: ["0030", "0105", "0200"], cap: ["ასტრონავტი მზადაა", "აფრენა!", "თქვენი გვერდი"], song: "8-ბიტი" }
+};
+const q = new URLSearchParams(location.search).get("d") || "cover", r = document.getElementById("r");
+const ph = (slug, f, x, y, w, rot, cap, z) => `<div class="ph" style="background-image:url(../frames/v-${slug}/${f}.jpg);left:${x}px;top:${y}px;width:${w}px;height:${Math.round(w * 16 / 9)}px;transform:rotate(${rot}deg);z-index:${z || 1}">${cap ? `<span>${cap}</span>` : ""}</div>`;
+const vars = c => `--b1:${c[0]};--b2:${c[1]};--ink:${c[2]};--mut:${c[3]};--acc:${c[4]};--gl:${c[5]};--line:${c[6]}`;
+if (D[q]){ const d = D[q]; document.body.style.cssText = vars(d.c) + `;--fs:${d.fs}`; if (d.light) document.body.classList.add("light");
+  r.innerHTML = `<div class="glow"></div><div class="top"><span>ამბავი</span><span>ახალი კოლექცია · ${d.n} / 10</span></div>
+  <h1>${d.name}</h1><div class="sc">${d.sc}</div><p class="sub">${d.kind}<br><b style="font-weight:500;color:var(--ink)">გახსნა:</b> ${d.open}</p>
+  ${ph(q, d.f[0], 40, 430, 300, -5, d.cap[0])}${ph(q, d.f[2], 740, 430, 300, 5, d.cap[2])}${ph(q, d.f[1], 345, 390, 390, 0, d.cap[1], 2)}
+  <div class="chips"><span>🌍 3D სამყარო მთელ გვერდზე</span><span>🎵 ${d.song}</span><span>🎟 დადასტურება-ბილეთი</span><span>📅 კალენდარში დამატება</span></div>
+  <div class="cta">💌 შეკვეთისთვის მოგვწერეთ პირადში</div>`;
+} else {
+  document.body.style.cssText = vars(["#2A1F3A", "#0A0710", "#FFF6EA", "rgba(255,240,222,.72)", "#E9C98A", "rgba(233,201,138,.18)", "rgba(255,220,180,.25)"]) + ";--fs:'Pinyon Script'";
+  const ks = Object.keys(D); r.innerHTML = `<div class="glow"></div><div class="top"><span>ამბავი</span><span>10 / 25</span></div>
+  <h1 style="top:96px">ახალი კოლექცია</h1><div class="sc" style="top:192px">10 ახალი სამყარო</div>
+  <p class="sub" style="top:268px">ყოველი მოსაწვევი — ცოცხალი 3D სამყარო, თავისი გახსნით და მელოდიით</p>
+  ${ks.map((k, i) => { const col = i % 5, row = Math.floor(i / 5); return ph(k, D[k].f[1], 44 + col * 202, 355 + row * 435, 186, 0, D[k].name).replace(/height:[0-9]+px/, "height:410px"); }).join("")}
+  <div class="cta">👉 გადაფურცლეთ · 💌 შეკვეთისთვის მოგვწერეთ პირადში</div>`;
+}
+Promise.all([document.fonts.ready, ...[...document.querySelectorAll(".ph")].map(e => new Promise(x => { const i = new Image(); i.onload = i.onerror = x; i.src = getComputedStyle(e).backgroundImage.slice(5, -2); }))]).then(() => setTimeout(() => window.__ready = true, 400));
+</script></body></html>

@@ -1,0 +1,71 @@
+ფოტოების ჩასმა — „მარგალიტის ფარდა“ (ნათია & დავითი)
+=====================================================
+
+როგორ მუშაობს:
+  ამ საქაღალდეში (images/) ჩადეთ ფაილი ზუსტად ქვემოთ მოცემული სახელით.
+  გვერდი თავად იპოვის და ილუსტრაციის ნაცვლად ფოტოს აჩვენებს.
+  თუ ფაილი არ არის, ჩანს ჩაშენებული 3D ნაქარგი სურათი (ბაღი, ტაძარი, კაბები, მამული) —
+  ის თვითონ „იქარგება“, ბრწყინავს და მოძრაობს. ფოტოს ჩადების შემდეგ 3D-ის ნაცვლად ფოტო ჩანს,
+  ამიტომ ფოტოები მხოლოდ მაშინ ჩადეთ, თუ კლიენტს ნამდვილი ფოტო უნდა.
+
+  ფორმატი: .jpg, სასურველია 1200–1600px სიგანე, 300–500 KB-მდე (შეკუმშეთ squoosh.app-ზე).
+
+სურათის გენერაცია (Midjourney / DALL·E / Leonardo / Ideogram / Gemini):
+  ქვემოთ ჩამოთვლილი ინგლისური ტექსტი პირდაპირ დააკოპირეთ.
+  ყველას ერთი სტილი აქვს, რომ გვერდი ერთიანი გამოვიდეს: ხელით ნაქარგი მძივები,
+  მარგალიტები და ჩითები სპილოს ძვლისფერ სელზე, ფოტორეალისტური მაკრო.
+
+  საერთო სტილი (ყველა პრომპტს ბოლოში ემატება):
+  STYLE = hand-embroidered beadwork on ivory linen, tiny freshwater pearls, glass seed beads,
+  champagne gold sequins and bugle beads, soft natural daylight, shallow depth of field,
+  photorealistic macro photography, warm cream and sage palette, elegant, luxurious, no text, no people
+
+---------------------------------------------------------------------
+1) garden.jpg — მთავარ გვერდზე, სახელების ქვემოთ (ბაღი / ხეივანი)
+   ზომა: 3:4 (ვერტიკალური)
+   Prompt:
+   A formal Georgian vineyard garden with tall cypress trees and round olive trees lining a
+   cream stone path that leads to a distant manor, entirely embroidered with beads and pearls,
+   + STYLE --ar 3:4
+
+2) arch.jpg — „განრიგი“ სექცია (ჯვრისწერის თაღი)
+   ზომა: 4:5
+   Prompt:
+   An old Georgian stone church arch doorway framed by climbing white roses and ivy,
+   rendered as intricate pearl and bead embroidery, + STYLE --ar 4:5
+
+3) dress-code.jpg — „დრესკოდი“ სექცია
+   ზომა: 4:5
+   Prompt:
+   An elegant evening gown and a tailored tuxedo jacket on a dress form, in champagne,
+   sage green and ivory tones, embroidered with pearls and sequins, + STYLE --ar 4:5
+
+4) venue.jpg — „ლოკაცია“ სექცია (მამული / რესტორანი)
+   ზომა: 4:3 (ჰორიზონტალური)
+   Prompt:
+   A grand Kakhetian wine estate with a long balcony, arched windows and vineyard rows
+   in front of the Caucasus mountains at golden hour, made of bead embroidery, + STYLE --ar 4:3
+
+---------------------------------------------------------------------
+წყვილის ფოტოები (აქ რეალური ფოტოები ჯობია — ტელეფონით გადაღებულიც კარგია):
+
+  story-1.jpg  — პირველი შეხვედრა (2019)        ზომა 1:1
+  story-2.jpg  — ნიშნობამდე პერიოდი (2022)      ზომა 1:1
+  story-3.jpg  — ხელის თხოვნა (2026)            ზომა 1:1
+  gallery-1.jpg ... gallery-4.jpg — გალერეა      ზომა 1:1 ან 4:5
+
+  ეს ფოტოები მრგვალ „საქარგავ რგოლებში“ ჩანს, ამიტომ სახე ცენტრში უნდა იყოს.
+
+  თუ წყვილის ფოტოებიც ამავე სტილში გინდათ (AI-ით, მათი ფოტოს მიხედვით):
+  Prompt:
+  A romantic couple portrait, [აღწერეთ წყვილი], recreated as hand-embroidered beadwork
+  and pearls on ivory linen, + STYLE --ar 1:1
+  (Midjourney-ში მათი ფოტო დაამატეთ როგორც image reference / --cref.)
+
+---------------------------------------------------------------------
+მნიშვნელოვანი:
+  • სხვისი საიტიდან ან ინტერნეტიდან აღებულ სურათებს ნუ გამოიყენებთ — ავტორის
+    ნებართვის გარეშე ეს საავტორო უფლებების დარღვევაა. თქვენ მიერ დაგენერირებული ან
+    კლიენტის მიერ მოწოდებული ფოტოები უსაფრთხოა.
+  • ვიდეოს შესაქმნელად (Runway / Kling / Pika) იგივე garden.jpg გამოდგება:
+    "slow cinematic camera push-in, pearls gently swaying, sequins sparkling" — 5 წმ.

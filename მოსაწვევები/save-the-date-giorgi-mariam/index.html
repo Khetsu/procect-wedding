@@ -1,0 +1,134 @@
+<!doctype html>
+<!-- ამბავი · მოსაწვევი „save-the-date-giorgi-mariam“ — გიორგი & მარიამი · Save the Date
+     გახსნა: gate-doors.js. ტექსტები, ფერები: js/config.js · სტილი: css/theme.css · 3D ილუსტრაცია: images/hero.jpg -->
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>გიორგი & მარიამი · Save the Date</title>
+<meta name="theme-color" content="#F7F4EE">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@400;500;600&family=Noto+Serif+Georgian:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/theme.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+
+<div class="gate" id="gate" role="button" tabindex="0" aria-label="მოსაწვევის გახსნა" data-stages="s1:0,s2:2600" data-open="3000" data-burst="450:gold::50" hidden>
+  <p class="g-top"><span class="g-kick" data-i18n="gotInvite"></span><span class="g-script">save the date</span></p>
+  <p class="g-hint"><svg><use href="#i-heart"/></svg><span data-i18n="tapHint"></span></p>
+</div>
+<script>try{document.getElementById("gate").hidden=false;document.documentElement.classList.add("gated")}catch(e){}</script>
+
+<main class="col">
+  <header class="hero foil">
+    <div class="foil-ring hx" style="--d:.2;--hx:hx-zoom"></div>
+    <div class="hero-in">
+      <p class="f-small hx" style="--d:.5">save the</p>
+      <p class="f-date hx" style="--d:.7">date</p>
+      <p class="f-names hx" style="--d:1.0" data-t="host"></p>
+      <p class="f-num hx" style="--d:1.3"><b data-t="day"></b><span data-t="month"></span><b data-t="year"></b></p>
+      <p class="caps hx" style="--d:1.6" data-t="city"></p>
+    </div>
+  </header>
+
+  <section class="sec center">
+    
+    <p class="text" data-anim="up" data-t="lead"></p>
+    <div class="orn" aria-hidden="true"><i></i><svg><use href="#i-sparkle"/></svg><i></i></div>
+    <div class="count" id="count" data-anim="up"></div>
+    <p class="caps" data-anim="up" data-i18n="cdTitle"></p>
+    <div class="ctas" data-anim="up" data-ctas></div>
+  </section>
+
+  <section class="sec panel" data-section="events">
+    <h2 class="sec-title" data-anim="up" data-i18n="dayTitle"></h2>
+    <ol class="tl" id="day"></ol>
+  </section>
+
+  <section class="sec">
+    <article class="venue" data-anim="tilt3d">
+      <svg class="v-ic"><use href="#i-pin"/></svg>
+      <p class="caps" data-i18n="placeTitle"></p>
+      <h2 class="v-title" data-t="place"></h2>
+      <p class="v-time" data-t="placeTime"></p>
+      <p class="v-addr" data-t="placeAddr"></p>
+      <a class="btn acc-btn js-map" href="#" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg><span data-i18n="mapBtn"></span></a>
+    </article>
+  </section>
+
+  <section class="sec" data-section="details" style="padding-top:0">
+    <h2 class="sec-title" data-anim="up" data-i18n="detailsTitle"></h2>
+    <div class="dets" id="details"></div>
+  </section>
+
+
+  <!-- ============ DRESS CODE COLOURS ============ -->
+  <section class="sec center" style="padding-top:10px">
+    <h2 class="sec-title" data-anim="up" data-i18n="paletteTitle"></h2>
+    <div class="palette" id="palette" data-anim="up"></div>
+  </section>
+
+  <!-- ============ QUESTIONS ============ -->
+  <section class="sec" style="padding-top:10px">
+    <h2 class="sec-title" data-anim="up" data-i18n="faqTitle"></h2>
+    <div class="faq" id="faq"></div>
+  </section>
+
+  <!-- ============ WISHES ENVELOPE: tap, it opens, write a wish ============ -->
+  <section class="sec center wishes" style="padding-top:10px">
+    <h2 class="sec-title" data-anim="up" data-i18n="wishTitle"></h2>
+    <p class="text" data-anim="up" data-i18n="wishSub" style="margin-top:-10px"></p>
+    <div class="wenv" id="wenv" role="button" tabindex="0" data-anim="tilt3d">
+      <div class="w-back"></div><div class="w-card"><svg><use href="#i-heart"/></svg><span data-i18n="wishCard"></span></div><div class="w-front"></div><div class="w-flap"></div><i class="w-seal"><svg><use href="#i-heart"/></svg></i>
+    </div>
+    <form class="wish-form" id="wish-form" hidden>
+      <input class="input" id="w-name" type="text" autocomplete="name" data-i18n-ph="wishName">
+      <textarea class="textarea" id="w-text" data-i18n-ph="wishPh"></textarea>
+      <div class="send"><a class="btn acc-btn" id="w-send" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg><span data-i18n="wishSend"></span></a><button type="button" class="btn ghost" id="w-copy"><svg><use href="#i-copy"/></svg><span id="w-copy-l" data-i18n="wishCopy"></span></button></div>
+    </form>
+  </section>
+
+  <section class="sec" id="rsvp" style="padding-top:10px">
+    <h2 class="sec-title" data-anim="up" data-i18n="rsvpTitle"></h2>
+    <div class="rsvp" id="rsvp-box" data-anim="tilt3d"></div>
+  </section>
+
+  <footer class="foot">
+    <p class="f-script gold" data-t="host"></p>
+    <p class="caps" data-t="dots"></p>
+  </footer>
+</main>
+
+<template id="tpl-event"><li class="ev" data-anim="up"><span class="ev-ic"><svg data-f="icon"><use href="#i-star"/></svg></span><div><p class="ev-time" data-f="time"></p><p class="ev-title" data-f="title"></p></div></li></template>
+<template id="tpl-detail"><div class="det" data-anim="up"><svg data-f="icon"><use href="#i-star"/></svg><div><p class="d-l" data-f="label"></p><p class="d-v" data-f="value"></p></div></div></template>
+
+<script src="js/config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/music.js"></script>
+<script src="js/core.js"></script>
+<script>
+(function(){ var C = window.CONFIG; document.querySelectorAll(".js-map").forEach(function(a){ a.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.placeMap || ""); });
+  if (!C.placeTime) document.querySelectorAll(".v-time").forEach(function(e){ e.remove(); }); })();
+</script>
+<script>
+/* palette, FAQ and the wishes envelope */
+(function(){ var C = window.CONFIG, en = function(){ return document.documentElement.lang === "en"; };
+  var pal = document.getElementById("palette"); if (pal) pal.innerHTML = (C.palette || []).map(function(c){ return '<i style="background:' + c + '"></i>'; }).join("");
+  function faq(){ var f = document.getElementById("faq"); if (!f) return; f.innerHTML = (C.faq || []).map(function(q){ return '<details class="qa"><summary>' + (en() ? q[1] : q[0]) + '</summary><p>' + (en() ? q[3] : q[2]) + '</p></details>'; }).join(""); }
+  faq(); document.querySelectorAll("[data-lang]").forEach(function(b){ b.addEventListener("click", function(){ setTimeout(faq, 0); }); });
+  var env = document.getElementById("wenv"), form = document.getElementById("wish-form");
+  function openEnv(){ if (env.classList.contains("open")) return; env.classList.add("open"); setTimeout(function(){ form.hidden = false; form.classList.add("show"); }, 900); if (window.FX){ var r = env.getBoundingClientRect(); FX.burst(C.rsvpFx || "hearts", r.left + r.width / 2, r.top + r.height * .3, 28); } }
+  env.addEventListener("click", openEnv); env.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); openEnv(); } });
+  function msg(){ var n = document.getElementById("w-name").value.trim(), t = document.getElementById("w-text").value.trim(); return (en() ? "A wish" : "სურვილი") + (n ? " · " + n : "") + ":\n" + t; }
+  document.getElementById("w-send").addEventListener("click", function(){ this.href = "https://wa.me/" + String(C.whatsapp || "").replace(/\D/g, "") + "?text=" + encodeURIComponent(msg()); });
+  document.getElementById("w-copy").addEventListener("click", function(){ try { navigator.clipboard.writeText(msg()); document.getElementById("w-copy-l").textContent = en() ? "Copied!" : "დაკოპირდა!"; } catch (e) {} });
+})();
+</script>
+<script src="js/gate-doors.js"></script>
+</body>
+</html>

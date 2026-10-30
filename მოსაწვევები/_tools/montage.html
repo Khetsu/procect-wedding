@@ -1,0 +1,172 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>montage</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;500;600&family=Noto+Sans+Georgian:wght@500;600;700&family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&display=swap">
+</head><body>
+<script type="module">
+/* ამბავი · მონტაჟის ძრავი. montage.html?spec=specs/x.json[&cover=1]
+   კადრებს იღებს frames/<dir>/NNNN.jpg-დან (1080x1920, 30fps, ჩაწერისას გახსნა იწყება 1.5 წმ-ზე), აწყობს სეგმენტებს
+   გადასვლებით, ტექსტებით, ნომრებით, თითის შეხებით, გაყოფილი ეკრანით, ბადით და შეტყობინებით; ბოლოს — ამბავის ბარათი და მუსიკა.
+   შედეგი: window.__mp4 (base64) ან cover-ისთვის window.__png. */
+import { Muxer, ArrayBufferTarget } from "https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.mjs";
+const P = new URLSearchParams(location.search), spec = await (await fetch(P.get("spec") + "?t=" + Date.now())).json();
+const W = 1080, H = 1920, FPS = 30, TH = Object.assign({ bg1: "#2A1F16", bg2: "#0B0806", ink: "#FBF4E8", acc: "#E8CB8A" }, spec.theme || {});
+const FS = '"Noto Serif Georgian"', FA = '"Noto Sans Georgian"', FN = '"Cormorant Garamond"', FV = '"Great Vibes"';
+await Promise.race([Promise.all(["500 60px " + FS, "600 60px " + FS, "400 60px " + FS, "700 60px " + FA, "600 60px " + FA, "600 60px " + FN, "400 60px " + FV].map(f => document.fonts.load(f, "აბA1"))), new Promise(r => setTimeout(r, 5000))]);
+const lerp = (a, b, k) => a + (b - a) * k, clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), seg01 = (t, a, b) => clamp((t - a) / (b - a));
+const easeO = t => 1 - Math.pow(1 - t, 3), easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, back = t => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+
+/* ---------- frames ---------- */
+const cache = new Map();
+async function frame(dir, idx){ idx = Math.max(0, Math.min(989, Math.round(idx))); const u = `frames/${dir}/${String(idx).padStart(4, "0")}.jpg`;
+  if (cache.has(u)) return cache.get(u); const b = await createImageBitmap(await (await fetch(u)).blob()); cache.set(u, b);
+  if (cache.size > 70){ const k = cache.keys().next().value; cache.get(k).close(); cache.delete(k); } return b; }
+function cover(c, img, x, y, w, h, z = 1, cx = .5, cy = .5){ const s = Math.max(w / img.width, h / img.height) * z, dw = img.width * s, dh = img.height * s;
+  c.save(); c.beginPath(); c.rect(x, y, w, h); c.clip(); c.drawImage(img, x + (w - dw) * cx, y + (h - dh) * cy, dw, dh); c.restore(); }
+
+/* ---------- text ---------- */
+function text(c, s, x, y, o = {}){ const size = o.size || 64, lh = size * (o.lh || 1.22), lines = String(s).split("\n");
+  c.save(); c.font = `${o.weight || 500} ${size}px ${o.font || FS}`; c.textAlign = o.align || "center"; c.textBaseline = "middle"; c.globalAlpha *= o.alpha == null ? 1 : o.alpha;
+  if ("letterSpacing" in c) c.letterSpacing = (o.ls || 0) + "px";
+  const y0 = y - (lines.length - 1) * lh / 2;
+  if (o.pill){ const wMax = Math.max(...lines.map(l => c.measureText(l).width)), px = o.padX || 42, py = o.padY || 26, bw = wMax + px * 2, bh = lines.length * lh + py * 2 - (lh - size);
+    c.fillStyle = o.pill; c.beginPath(); c.roundRect(x - (o.align === "left" ? 0 : bw / 2), y - bh / 2, bw, bh, o.radius || Math.min(60, bh / 2)); c.fill(); if (o.pillLine){ c.strokeStyle = o.pillLine; c.lineWidth = 2; c.stroke(); } }
+  if (o.shadow !== false){ c.shadowColor = o.shadowColor || "rgba(0,0,0,.55)"; c.shadowBlur = o.blur == null ? 24 : o.blur; c.shadowOffsetY = 3; }
+  if (o.stroke){ c.lineJoin = "round"; c.lineWidth = o.stroke; c.strokeStyle = o.strokeColor || "rgba(0,0,0,.6)"; lines.forEach((l, i) => c.strokeText(l, x, y0 + i * lh)); }
+  c.fillStyle = o.color || "#fff"; lines.forEach((l, i) => c.fillText(l, x, y0 + i * lh)); c.restore(); }
+const inOut = (lt, dur, a = .35, b = .3) => Math.min(easeO(seg01(lt, 0, a)), 1 - seg01(lt, dur - b, dur));
+
+/* ---------- overlays ---------- */
+function badge(c, n, lt){ const k = back(seg01(lt, .05, .45)), x = 150, y = 300; c.save(); c.translate(x, y); c.scale(k, k);
+  c.shadowColor = "rgba(0,0,0,.45)"; c.shadowBlur = 30; c.fillStyle = "rgba(10,8,6,.55)"; c.beginPath(); c.arc(0, 0, 82, 0, 7); c.fill(); c.shadowBlur = 0;
+  c.strokeStyle = TH.acc; c.lineWidth = 4; c.beginPath(); c.arc(0, 0, 82, 0, 7); c.stroke(); c.lineWidth = 1.5; c.beginPath(); c.arc(0, 0, 70, 0, 7); c.stroke(); c.restore();
+  text(c, n, x, y + 4, { size: 92 * k, weight: 600, font: FN, color: TH.acc, shadow: false }); }
+function label(c, s, lt, dur, y = 1640){ const a = inOut(lt, dur, .35, .25); if (a <= 0) return; text(c, s, W / 2, y + (1 - a) * 30, { size: 48, weight: 500, alpha: a, pill: "rgba(12,9,6,.5)", pillLine: "rgba(232,203,138,.45)", padX: 46, padY: 24 }); }
+function tap(c, lt, at, x = 540, y = 1150){ const k = lt - at; if (k < -.55 || k > .8) return;
+  const app = easeO(seg01(k, -.55, 0)), press = k >= 0 ? Math.max(0, 1 - k / .2) : 0;
+  c.save(); c.globalAlpha = Math.min(1, seg01(k, -.55, -.35)) * (1 - seg01(k, .45, .8));
+  for (let i = 0; i < 2; i++){ const rk = seg01(k, i * .12, .6 + i * .12); if (rk <= 0 || rk >= 1) continue; c.strokeStyle = `rgba(255,255,255,${.9 * (1 - rk)})`; c.lineWidth = 6; c.beginPath(); c.arc(x, y, 30 + rk * 150, 0, 7); c.stroke(); }
+  c.fillStyle = `rgba(255,255,255,${.35 + .4 * press})`; c.beginPath(); c.arc(x, y, 36 - press * 8, 0, 7); c.fill();
+  const fx = x + (1 - app) * 90, fy = y + (1 - app) * 140, g = c.createRadialGradient(fx, fy, 0, fx, fy, 70); g.addColorStop(0, "rgba(255,255,255,.95)"); g.addColorStop(.45, "rgba(255,255,255,.55)"); g.addColorStop(1, "rgba(255,255,255,0)");
+  c.fillStyle = g; c.beginPath(); c.arc(fx, fy, 70 - press * 12, 0, 7); c.fill(); c.strokeStyle = "rgba(255,255,255,.9)"; c.lineWidth = 4; c.beginPath(); c.arc(fx, fy, 46 - press * 8, 0, 7); c.stroke(); c.restore(); }
+function counter(c, s){ text(c, s, W - 80, 120, { size: 40, weight: 600, font: FN, color: "rgba(255,255,255,.92)", align: "right", ls: 4 }); }
+
+/* ---------- the plain paper invitation (left half of the split) ---------- */
+function paper(c, lt, names, date){ const cx = 270, cy = 1000, rot = -.05 + Math.sin(lt * .8) * .004;
+  c.save(); const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#9d9a95"); g.addColorStop(1, "#6f6c68"); c.fillStyle = g; c.fillRect(0, 0, 540, H);
+  c.translate(cx, cy); c.rotate(rot); c.shadowColor = "rgba(0,0,0,.35)"; c.shadowBlur = 30; c.shadowOffsetY = 14; c.fillStyle = "#f1ebe0"; c.fillRect(-200, -290, 400, 580); c.shadowColor = "transparent";
+  c.strokeStyle = "#b9ae9c"; c.lineWidth = 2; c.strokeRect(-178, -268, 356, 536); c.restore();
+  c.save(); c.translate(cx, cy); c.rotate(rot); c.fillStyle = "#6d6256"; c.textAlign = "center"; c.textBaseline = "middle";
+  c.font = `500 24px ${FS}`; c.fillText("მოსაწვევი", 0, -190); c.font = `500 46px ${FS}`; c.fillText(names[0], 0, -90); c.font = `400 40px ${FV}`; c.fillText("&", 0, -30); c.font = `500 46px ${FS}`; c.fillText(names[1], 0, 30);
+  c.font = `600 34px ${FN}`; c.fillText(date, 0, 120); c.font = `400 22px ${FS}`; c.fillText("რესტორანი · 18:00", 0, 180); c.restore(); }
+
+/* ---------- segments ---------- */
+async function drawSeg(c, S, lt){
+  c.save(); c.clearRect(0, 0, W, H); c.fillStyle = "#000"; c.fillRect(0, 0, W, H);
+  const src = d => (S.from + lt * (S.speed || 1)) * FPS + (d || 0);
+  const zoom = () => (S.zoom ? lerp(S.zoom[0], S.zoom[1], clamp(lt / S.dur)) : 1) * (S.punch ? 1 + .08 * Math.max(0, 1 - lt / .28) : 1);
+  if (S.type === "clip"){ cover(c, await frame(S.dir, src()), 0, 0, W, H, zoom(), .5, S.cy == null ? .5 : S.cy); }
+  else if (S.type === "grid"){ const g = 10, cw = (W - g) / 2, ch = (H - g) / 2;
+    for (let i = 0; i < 4; i++){ const x = (i % 2) * (cw + g), y = Math.floor(i / 2) * (ch + g), d = (S.delays || [0, 0, 0, 0])[i];
+      cover(c, await frame(S.dirs[i], (S.from + Math.max(0, lt - d) * (S.speed || 1)) * FPS), x, y, cw, ch, 1.12, .5, .46);
+      if (S.labels) text(c, S.labels[i], x + cw / 2, y + ch - 70, { size: 34, weight: 500, alpha: inOut(lt, S.dur), pill: "rgba(12,9,6,.5)", padX: 26, padY: 16 }); }
+    c.fillStyle = TH.acc; c.fillRect(cw, 0, g, H); c.fillRect(0, ch, W, g); }
+  else if (S.type === "split"){ paper(c, lt, S.names || ["ნინო", "გიორგი"], S.date || "12 · 06 · 2027"); cover(c, await frame(S.dir, src()), 540, 0, 540, H, 1.0, .5, .5);
+    c.fillStyle = "rgba(255,255,255,.9)"; c.fillRect(538, 0, 4, H);
+    const a = inOut(lt, S.dur, .3, .2); text(c, "📄 ქაღალდი", 270, 250, { size: 44, weight: 600, font: FA, alpha: a, pill: "rgba(0,0,0,.35)", padX: 30, padY: 18 });
+    text(c, "✨ ამბავი", 810, 250, { size: 44, weight: 600, font: FA, alpha: a, color: "#2A1E10", pill: TH.acc, padX: 30, padY: 18, shadow: false });
+    c.save(); c.globalAlpha = a; c.fillStyle = "#fff"; c.beginPath(); c.arc(540, 1000, 58, 0, 7); c.fill(); c.restore(); text(c, "VS", 540, 1004, { size: 46, weight: 700, font: FA, color: "#2A1E10", shadow: false, alpha: a }); }
+  else if (S.type === "card"){ if (S.bgdir){ c.filter = "blur(18px) brightness(.45)"; cover(c, await frame(S.bgdir, (S.bgfrom || 6) * FPS + lt * 10), 0, 0, W, H, 1.15); c.filter = "none"; }
+    else { const g = c.createRadialGradient(W / 2, H * .42, 50, W / 2, H * .42, H * .8); g.addColorStop(0, TH.bg1); g.addColorStop(1, TH.bg2); c.fillStyle = g; c.fillRect(0, 0, W, H); }
+    const a = inOut(lt, S.dur, .45, .3), dy = (1 - easeO(seg01(lt, 0, .6))) * 40;
+    if (S.kicker) text(c, S.kicker, W / 2, 760 + dy, { size: 36, weight: 500, alpha: a, color: TH.acc, ls: 10 });
+    text(c, S.title, W / 2, 920 + dy, { size: S.size || 84, weight: 500, alpha: a, lh: 1.2 });
+    if (S.sub) text(c, S.sub, W / 2, 1110 + dy * 1.4, { size: 44, weight: 400, alpha: a * .92, lh: 1.35 }); }
+  else if (S.type === "pov"){ c.filter = "blur(22px) brightness(.5)"; cover(c, await frame(S.dir, 20), 0, 0, W, H, 1.15); c.filter = "none";
+    const k = easeO(seg01(lt, .25, .85)), y = lerp(-260, 180, k), x = 60, w = W - 120, h = 230;
+    c.save(); c.globalAlpha = seg01(lt, .25, .5); c.shadowColor = "rgba(0,0,0,.35)"; c.shadowBlur = 40; c.fillStyle = "rgba(250,248,244,.96)"; c.beginPath(); c.roundRect(x, y, w, h, 46); c.fill(); c.restore();
+    c.save(); c.globalAlpha = seg01(lt, .25, .5); const ag = c.createLinearGradient(x + 40, y + 50, x + 160, y + 170); ag.addColorStop(0, TH.acc); ag.addColorStop(1, "#b0844a"); c.fillStyle = ag; c.beginPath(); c.arc(x + 100, y + 115, 62, 0, 7); c.fill(); c.restore();
+    const al = seg01(lt, .25, .5); text(c, "💌", x + 100, y + 118, { size: 60, alpha: al, shadow: false, font: "'Segoe UI Emoji'" });
+    text(c, S.from_ || "ნინო & გიორგი", x + 190, y + 78, { size: 40, weight: 600, font: FA, align: "left", color: "#2a2520", shadow: false, alpha: al });
+    text(c, S.msg || "გამოგიგზავნეს მოსაწვევი ✨", x + 190, y + 134, { size: 34, weight: 500, font: FA, align: "left", color: "#6b625a", shadow: false, alpha: al });
+    text(c, "ახლა", x + w - 40, y + 78, { size: 28, weight: 500, font: FA, align: "right", color: "#9a9088", shadow: false, alpha: al });
+    text(c, S.pov || "POV: შენ მიიღე მოსაწვევი", W / 2, 1000, { size: 70, weight: 600, font: FA, alpha: seg01(lt, .9, 1.3), lh: 1.25 }); }
+  /* per-segment overlays */
+  if (S.num) badge(c, S.num, lt);
+  if (S.label) label(c, S.label, lt, S.dur, S.labelY);
+  if (S.tap != null) tap(c, lt, S.tap, S.tapX, S.tapY);
+  if (S.count) counter(c, S.count);
+  if (S.hook) { const a = inOut(lt, S.dur, .3, .25); text(c, S.hook, W / 2, S.hookY || 300, { size: S.hookSize || 66, weight: 600, font: FA, alpha: a, lh: 1.25, stroke: 0 }); }
+  c.restore();
+}
+
+/* ---------- end card ---------- */
+function endCard(c, k){ const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, TH.bg1); g.addColorStop(1, TH.bg2); c.fillStyle = g; c.fillRect(0, 0, W, H);
+  c.save(); c.translate(W / 2, H / 2); const z = 1 + .03 * k; c.scale(z, z); c.translate(-W / 2, -H / 2);
+  const E = spec.endLines || {};
+  text(c, "ამბავი", W / 2, H / 2 - 190, { size: 150, weight: 500, color: TH.ink, ls: 18, shadow: false });
+  text(c, E.sub || "3D ციფრული მოსაწვევები", W / 2, H / 2 - 40, { size: 44, weight: 400, color: TH.ink, ls: 6, shadow: false });
+  c.fillStyle = TH.acc; c.fillRect(W / 2 - 110, H / 2 + 40, 220, 3);
+  text(c, E.l1 || "ქორწილი · ნათლობა · დაბადების დღე", W / 2, H / 2 + 120, { size: 34, weight: 400, color: TH.ink, ls: 2, shadow: false });
+  text(c, E.l2 || "კორპორატიული საღამოები", W / 2, H / 2 + 175, { size: 34, weight: 400, color: TH.ink, ls: 2, shadow: false });
+  text(c, E.cta || "შეუკვეთეთ თქვენი მოსაწვევი ✨", W / 2, H / 2 + 300, { size: 46, weight: 500, color: TH.acc, ls: 1, shadow: false }); c.restore(); }
+
+/* ---------- timeline ---------- */
+const segs = spec.segs, starts = []; let total = 0; for (const s of segs){ starts.push(total); total += s.dur; }
+const texts = spec.texts || [];
+const A = new OffscreenCanvas(W, H), B = new OffscreenCanvas(W, H), O = new OffscreenCanvas(W, H), a = A.getContext("2d"), b = B.getContext("2d"), o = O.getContext("2d");
+async function compose(t){
+  let k = starts.length - 1; while (k > 0 && starts[k] > t) k--; const S = segs[k], lt = t - starts[k];
+  await drawSeg(a, S, lt); o.clearRect(0, 0, W, H);
+  const tr = S.tr || "cut", d = S.trd || .3;
+  if (k > 0 && tr !== "cut" && lt < d){ const P0 = segs[k - 1], q = lt / d; await drawSeg(b, P0, P0.dur + lt);
+    if (tr === "fade"){ o.drawImage(B, 0, 0); o.globalAlpha = easeIO(q); o.drawImage(A, 0, 0); o.globalAlpha = 1; }
+    else if (tr === "flash"){ o.drawImage(q < .5 ? B : A, 0, 0); o.fillStyle = `rgba(255,248,235,${Math.sin(q * Math.PI) * .9})`; o.fillRect(0, 0, W, H); }
+    else if (tr === "zoom"){ o.drawImage(B, 0, 0); o.save(); o.globalAlpha = easeIO(q); const z = lerp(1.18, 1, easeO(q)); o.translate(W / 2, H / 2); o.scale(z, z); o.drawImage(A, -W / 2, -H / 2); o.restore(); }
+    else if (tr === "whip"){ const e = easeIO(q); o.filter = `blur(${Math.sin(q * Math.PI) * 18}px)`; o.drawImage(B, -e * W, 0); o.drawImage(A, (1 - e) * W, 0); o.filter = "none"; }
+  } else o.drawImage(A, 0, 0);
+  for (const T of texts){ if (t < T.from || t > T.to) continue; const al = Math.min(easeO(seg01(t, T.from, T.from + .35)), 1 - seg01(t, T.to - .3, T.to));
+    text(o, T.text, W / 2, (T.y || 300) + (1 - al) * 20, { size: T.size || 64, weight: T.weight || 600, font: T.font === "serif" ? FS : FA, alpha: al, color: T.color || "#fff", lh: 1.25, pill: T.pill, padX: 40, padY: 22, pillLine: T.pillLine }); }
+  if (spec.watermark !== false) text(o, "ამბავი", W / 2, H - 70, { size: 30, weight: 500, color: "rgba(255,255,255,.7)", ls: 12, blur: 10 });
+}
+
+/* ---------- preview stills mode: &stills=1.2,3.4 ---------- */
+if (P.has("stills")){ const out = [];
+  for (const t of P.get("stills").split(",").map(Number)){ await compose(t); const bl = await O.convertToBlob({ type: "image/jpeg", quality: .8 }), u = new Uint8Array(await bl.arrayBuffer()); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); out.push(btoa(s)); }
+  window.__stills = out; window.__done = true;
+} else
+/* ---------- cover image mode ---------- */
+if (P.has("cover")){ const C = spec.cover; const c = o;
+  cover(c, await frame(C.dir, C.idx), 0, 0, W, H, C.zoom || 1.05);
+  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "rgba(0,0,0,.55)"); g.addColorStop(.35, "rgba(0,0,0,0)"); g.addColorStop(.62, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,.7)"); c.fillStyle = g; c.fillRect(0, 0, W, H);
+  if (C.kicker) text(c, C.kicker, W / 2, 230, { size: 40, weight: 600, font: FA, color: TH.acc, ls: 8 });
+  text(c, C.title, W / 2, C.titleY || 420, { size: C.size || 104, weight: 700, font: FA, lh: 1.15, stroke: 8, strokeColor: "rgba(0,0,0,.35)" });
+  if (C.sub) text(c, C.sub, W / 2, 1640, { size: 50, weight: 600, font: FA, pill: "rgba(12,9,6,.55)", pillLine: "rgba(232,203,138,.5)", padX: 44, padY: 26 });
+  text(c, "ამბავი", W / 2, H - 90, { size: 34, weight: 500, color: "rgba(255,255,255,.85)", ls: 14 });
+  const bl = await O.convertToBlob({ type: "image/png" }), u = new Uint8Array(await bl.arrayBuffer()); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+  window.__png = btoa(s); window.__done = true;
+} else {
+  /* ---------- encode ---------- */
+  const FADE = spec.end === false ? 0 : Math.round(FPS * .5), HOLD = spec.end === false ? 0 : FPS * 3, N = Math.round(total * FPS), ALL = N + FADE + HOLD;
+  await new Promise((r, j) => { const s = document.createElement("script"); s.src = "http://localhost:5512/_core/js/music.js"; s.onload = r; s.onerror = j; document.head.appendChild(s); });
+  const abuf = await Music.render(spec.song, ALL / FPS, spec.adelay || .05);
+  const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: "avc", width: W, height: H, frameRate: FPS }, audio: { codec: "aac", numberOfChannels: 2, sampleRate: 48000 }, fastStart: "in-memory" });
+  const enc = new VideoEncoder({ output: (ch, m) => muxer.addVideoChunk(ch, m), error: e => { window.__err = String(e); } });
+  enc.configure({ codec: "avc1.640033", width: W, height: H, bitrate: 11_000_000, framerate: FPS, avc: { format: "avc" } });
+  let idx = 0; const push = async src => { const fr = new VideoFrame(src, { timestamp: Math.round(idx * 1e6 / FPS), duration: Math.round(1e6 / FPS) }); enc.encode(fr, { keyFrame: idx % (FPS * 2) === 0 }); fr.close(); idx++; while (enc.encodeQueueSize > 6) await new Promise(r => setTimeout(r, 4)); window.__progress = idx + "/" + ALL; };
+  try {
+    for (let i = 0; i < N; i++){ await compose(i / FPS); await push(O); }
+    const last = new OffscreenCanvas(W, H); last.getContext("2d").drawImage(O, 0, 0); const E = new OffscreenCanvas(W, H), e = E.getContext("2d");
+    for (let i = 0; i < FADE; i++){ endCard(e, 0); e.globalAlpha = 1 - (i + 1) / FADE; e.drawImage(last, 0, 0); e.globalAlpha = 1; await push(E); }
+    for (let i = 0; i < HOLD; i++){ endCard(e, i / HOLD); await push(E); }
+    await enc.flush();
+    const aenc = new AudioEncoder({ output: (ch, m) => muxer.addAudioChunk(ch, m), error: er => { window.__err = String(er); } });
+    aenc.configure({ codec: "mp4a.40.2", sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 });
+    const L = abuf.getChannelData(0), R = abuf.getChannelData(1), BL = 4800;
+    for (let off = 0; off < abuf.length; off += BL){ const n = Math.min(BL, abuf.length - off), d = new Float32Array(n * 2); d.set(L.subarray(off, off + n), 0); d.set(R.subarray(off, off + n), n);
+      const ad = new AudioData({ format: "f32-planar", sampleRate: 48000, numberOfFrames: n, numberOfChannels: 2, timestamp: Math.round(off / 48000 * 1e6), data: d }); aenc.encode(ad); ad.close(); }
+    await aenc.flush(); muxer.finalize();
+    const buf = new Uint8Array(muxer.target.buffer); let s = ""; for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+    window.__mp4 = btoa(s); window.__done = true;
+  } catch (er){ window.__err = String(er && er.stack || er); }
+}
+</script></body></html>

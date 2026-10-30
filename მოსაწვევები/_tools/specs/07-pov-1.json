@@ -1,0 +1,36 @@
+{
+ "song": "gala",
+ "adelay": 2.9,
+ "theme": {
+  "bg1": "#3A2616",
+  "bg2": "#0E0805",
+  "ink": "#FBF4E8",
+  "acc": "#E8CB8A"
+ },
+ "segs": [
+  {
+   "type": "pov",
+   "dir": "w-champagne",
+   "dur": 2.5,
+   "from_": "ანა & ლუკა",
+   "msg": "გამოგიგზავნეს მოსაწვევი 💍"
+  },
+  {
+   "type": "clip",
+   "dir": "w-champagne",
+   "from": 1,
+   "dur": 6.4,
+   "speed": 0.9,
+   "tap": 0.45,
+   "tr": "zoom",
+   "trd": 0.35
+  }
+ ],
+ "cover": {
+  "dir": "w-champagne",
+  "idx": 110,
+  "kicker": "POV",
+  "title": "შენ მიიღე\nმოსაწვევი 💌",
+  "sub": "▶ ნახე, როგორ იხსნება"
+ }
+}

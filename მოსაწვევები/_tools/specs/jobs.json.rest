@@ -1,0 +1,80 @@
+﻿[
+    {
+        "id":  "02-fifteen",
+        "folder":  "02-15-გახსნა-15-წამში",
+        "file":  "15-გახსნა-15-წამში.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "03-vs",
+        "folder":  "03-ქაღალდი-vs-ამბავი",
+        "file":  "ქაღალდი-vs-ამბავი.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "04-grid",
+        "folder":  "04-ოთხი-გახსნა-ერთად",
+        "file":  "ოთხი-გახსნა-ერთად.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "05-moment-1",
+        "folder":  "05-გახსნის-მომენტი",
+        "file":  "1-champagne.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "05-moment-2",
+        "folder":  "05-გახსნის-მომენტი",
+        "file":  "2-chapel.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "05-moment-3",
+        "folder":  "05-გახსნის-მომენტი",
+        "file":  "3-rings.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "05-moment-4",
+        "folder":  "05-გახსნის-მომენტი",
+        "file":  "4-veil.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "05-moment-5",
+        "folder":  "05-გახსნის-მომენტი",
+        "file":  "5-cake.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "06-every",
+        "folder":  "06-ყოველი-დღესასწაულისთვის",
+        "file":  "ყოველი-დღესასწაულისთვის.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "07-pov-1",
+        "folder":  "07-POV-მოსაწვევი-მიიღე",
+        "file":  "POV-1-champagne.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "07-pov-2",
+        "folder":  "07-POV-მოსაწვევი-მიიღე",
+        "file":  "POV-2-veil.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "07-pov-3",
+        "folder":  "07-POV-მოსაწვევი-მიიღე",
+        "file":  "POV-3-planets.mp4",
+        "cover":  true
+    },
+    {
+        "id":  "08-winter",
+        "folder":  "08-ზამთრის-ღონისძიებები",
+        "file":  "ზამთრის-ღონისძიებები.mp4",
+        "cover":  true
+    }
+]

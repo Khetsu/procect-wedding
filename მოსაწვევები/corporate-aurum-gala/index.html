@@ -1,0 +1,131 @@
+<!doctype html>
+<!-- ამბავი · კორპორატიული მოსაწვევი „corporate-aurum-gala“ — დიზაინი „ოქროს გალა“
+     გახსნა: 3D შავი კონვერტი ოქროს ბეჭდით (js/envelope3d.js). ტექსტები და ფერები: js/config.js · სტილი: css/theme.css -->
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Aurum Group · გალა საღამო</title>
+<meta name="description" content="Aurum Group · წლიური გალა საღამო · 18 დეკემბერი 2026, თბილისი">
+<meta name="theme-color" content="#0E0E11">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+Georgian:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/theme.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+
+<!-- ============ GATE: 3D envelope (js/envelope3d.js) ============ -->
+<div class="gate" id="gate" role="button" tabindex="0" aria-label="მოსაწვევის გახსნა" data-stages="s1:0,s2:2600" data-open="3300" data-burst="450:gold::40" hidden>
+  <div class="g-bg" aria-hidden="true"></div>
+  <p class="g-top"><span class="g-kicker">Aurum Group</span><span class="g-script">You are invited</span></p>
+  <div class="g-fallback" aria-hidden="true"><div class="gf-env"><div class="gf-flap"></div><div class="gf-seal" data-t="monogram"></div></div></div>
+  <p class="g-hint"><svg><use href="#i-sparkle"/></svg><span data-i18n="tapHint"></span></p>
+</div>
+<script>try{document.getElementById("gate").hidden=false;document.documentElement.classList.add("gated")}catch(e){}</script>
+
+<main class="col">
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="hero-photo kb" data-photo="heroPhoto"></div>
+    <div class="hero-in">
+      <p class="caps hx" style="--d:.4" data-t="kicker"></p>
+      <h1 class="h-name hx" style="--d:.8" data-t="host"></h1>
+      <p class="h-script gold hx" style="--d:1.2" data-t="script"></p>
+      <p class="h-date hx" style="--d:1.6"><i></i><span data-t="dots"></span><i></i></p>
+    </div>
+    <div class="edge" aria-hidden="true"></div>
+  </header>
+
+  <!-- ============ COUNTDOWN ============ -->
+  <section class="sec tight">
+    <div class="count" id="count" data-anim="up"></div>
+    <p class="caps center" data-anim="up" data-i18n="cdTitle"></p>
+    <div class="orn" aria-hidden="true"><i></i><svg><use href="#i-sparkle"/></svg><i></i></div>
+    <p class="text center" data-anim="up" data-t="lead"></p>
+  </section>
+
+  <!-- ============ TWO VENUE CARDS ============ -->
+  <section class="sec">
+    <article class="venue" data-anim="up" data-v="1">
+      <svg class="v-ic"><use href="#i-glasses"/></svg>
+      <h2 class="v-title" data-t="venue1"></h2>
+      <p class="v-time"><i></i><span data-t="venue1Time"></span><i></i></p>
+      <p class="caps" data-t="venue1Place"></p><p class="v-addr" data-t="venue1Addr"></p>
+      <a class="btn gold-btn js-map" href="#" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg><span data-i18n="mapBtn"></span></a>
+    </article>
+    <div class="orn" aria-hidden="true"><i></i><svg><use href="#i-sparkle"/></svg><i></i></div>
+    <article class="venue" data-anim="up" data-v="2">
+      <svg class="v-ic"><use href="#i-star"/></svg>
+      <h2 class="v-title" data-t="venue2"></h2>
+      <p class="v-time"><i></i><span data-t="venue2Time"></span><i></i></p>
+      <p class="caps" data-t="venue2Place"></p><p class="v-addr" data-t="venue2Addr"></p>
+      <a class="btn gold-btn js-map" href="#" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg><span data-i18n="mapBtn"></span></a>
+    </article>
+  </section>
+
+  <!-- ============ THE EVENING: icon timeline ============ -->
+  <section class="sec panel" data-section="events">
+    <p class="mono" data-t="monogram"></p>
+    <h2 class="sec-title" data-anim="up" data-i18n="dayTitle"></h2>
+    <ol class="tl" id="day"></ol>
+  </section>
+
+  <!-- ============ DRESS CODE ============ -->
+  <section class="sec center">
+    <h2 class="sec-title" data-anim="up" data-i18n="dressTitle"></h2>
+    <p class="big-script gold" data-anim="up" data-t="dressCode"></p>
+    <p class="text" data-anim="up" data-t="dressNote"></p>
+    <div class="palette" id="palette" data-anim="up"></div>
+  </section>
+
+  <!-- ============ SHARE ============ -->
+  <section class="sec share center">
+    <svg class="s-ic" data-anim="up"><use href="#i-camera"/></svg>
+    <h2 class="caps" data-anim="up" data-i18n="shareTitle"></h2>
+    <p class="text" data-anim="up" data-t="shareNote"></p>
+    <span class="tag" data-anim="up" data-t="hashtag"></span>
+  </section>
+
+  <!-- ============ COUNT ON US: contact + calendar ============ -->
+  <section class="sec center">
+    <h2 class="caps" data-anim="up" data-i18n="contactTitle"></h2>
+    <p class="text" data-anim="up" data-t="contactName"></p>
+    <a class="btn gold-btn js-ask" href="#" target="_blank" rel="noopener" data-anim="up"><svg><use href="#i-wa"/></svg><span data-i18n="ask"></span></a>
+    <div class="ctas" data-anim="up" data-ctas></div>
+  </section>
+
+  <!-- ============ RSVP ============ -->
+  <section class="sec" id="rsvp">
+    <h2 class="sec-title center" data-anim="up" data-i18n="rsvpTitle"></h2>
+    <div class="rsvp" id="rsvp-box" data-anim="up"></div>
+  </section>
+
+  <footer class="foot">
+    <p class="f-script gold">Aurum Group</p>
+    <p class="caps" data-t="dots"></p>
+  </footer>
+</main>
+
+<template id="tpl-event"><li class="ev" data-anim="up"><span class="ev-ic"><svg data-f="icon"><use href="#i-star"/></svg></span><div><p class="ev-time" data-f="time"></p><p class="ev-title" data-f="title"></p></div></li></template>
+
+<script src="js/config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/music.js"></script>
+<script src="js/core.js"></script>
+<script>
+/* map buttons, WhatsApp question, dress-code colours */
+(function(){ var C = window.CONFIG, wa = String(C.whatsapp || "").replace(/\D/g, "");
+  document.querySelectorAll(".venue").forEach(function(v){ var q = C["venue" + v.dataset.v + "Map"] || ""; v.querySelector(".js-map").href = /^https?:/.test(q) ? q : "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q); });
+  document.querySelectorAll(".js-ask").forEach(function(a){ a.href = "https://wa.me/" + wa + "?text=" + encodeURIComponent("გამარჯობა! კითხვა მაქვს გალა საღამოსთან დაკავშირებით:"); });
+  var pal = document.getElementById("palette"); if (pal) pal.innerHTML = (C.palette || []).map(function(c){ return "<i style=\"background:" + c + "\"></i>"; }).join("");
+})();
+</script>
+<script src="js/envelope3d.js"></script>
+</body>
+</html>

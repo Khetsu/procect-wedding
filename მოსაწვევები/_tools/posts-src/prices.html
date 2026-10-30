@@ -1,0 +1,71 @@
+<!doctype html><html lang="ka"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Serif+Georgian:wght@300;400;500;600&display=swap">
+<style>
+/* ამბავი · ფასები (1280x1600, მხოლოდ ქართულად) */
+html,body{margin:0}
+body{width:1280px;height:1600px;overflow:hidden;position:relative;font-family:"Noto Serif Georgian",serif;color:#4E4237;background:radial-gradient(90% 70% at 50% 35%,#FBF7F0,#EDE4D6)}
+.pat{position:absolute;inset:0;opacity:.07}
+.gold{color:#A88449}
+.hd{position:absolute;top:66px;left:0;right:0;text-align:center}
+.hd h1{margin:0;font:500 92px/1 "Noto Serif Georgian";letter-spacing:.2em;text-indent:.2em;color:#5A4C40}
+.hd p{margin:16px 0 0;font:400 22px/1 "Noto Serif Georgian";letter-spacing:.42em;text-indent:.42em;color:#8E7F70}
+.hd h2{margin:26px 0 0;font:400 34px/1 "Noto Serif Georgian";letter-spacing:.12em;color:#A88449}
+.cards{position:absolute;top:372px;left:52px;right:52px;display:grid;grid-template-columns:1fr 1.08fr 1fr;gap:22px;align-items:start}
+.c{position:relative;padding:44px 30px 34px;border-radius:30px;background:#FFFDF9;box-shadow:0 0 0 1px rgba(168,132,73,.18),inset 0 0 0 10px #FFFDF9,inset 0 0 0 11px rgba(168,132,73,.12),0 30px 60px -36px rgba(90,70,40,.5)}
+.c.top{margin-top:-30px;padding-top:56px;box-shadow:0 0 0 2px #C9A867,inset 0 0 0 10px #FFFDF9,inset 0 0 0 11px rgba(168,132,73,.3),0 40px 70px -34px rgba(120,90,40,.55)}
+.badge{position:absolute;top:-20px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:11px 26px;border-radius:30px;font:500 17px/1 "Noto Serif Georgian";color:#fff;background:linear-gradient(135deg,#D9BC7E,#A88449)}
+.c h3{margin:0;text-align:center;font:500 30px/1.2 "Noto Serif Georgian"}
+.c .s{margin:8px 0 0;text-align:center;font:400 15px/1 "Noto Serif Georgian";color:#9A8B7C}
+.pr{margin:26px 0 0;text-align:center;font:600 84px/1 "Cormorant Garamond";color:#5A4C40}
+.top .pr{font-size:96px;color:#A88449}
+.pr small{font:500 46px/1 "Noto Serif Georgian"}
+.ln{width:70px;height:1px;margin:20px auto 22px;background:#C9A867}
+.c ul{margin:0;padding:0;list-style:none}
+.c li{position:relative;padding:7px 0 7px 28px;font:400 17.5px/1.4 "Noto Serif Georgian"}
+.c li::before{content:"";position:absolute;left:2px;top:13px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#E9DFD0 60%,#CDBFAB)}
+.ex{position:absolute;top:975px;left:70px;right:70px;padding:30px 34px 26px;border-radius:30px;background:rgba(255,253,249,.85);box-shadow:0 0 0 1px rgba(168,132,73,.2)}
+.ex h4{margin:0 0 20px;text-align:center;font:500 26px/1 "Noto Serif Georgian";letter-spacing:.06em}
+.ex h4 span{display:block;margin-top:8px;font:400 15px/1 "Noto Serif Georgian";color:#9A8B7C;letter-spacing:0}
+.eg{display:flex;flex-wrap:wrap;justify-content:center;gap:16px 18px}
+.eg>div{flex:0 0 calc(25% - 14px);box-sizing:border-box}
+.eg div{text-align:center;padding:12px 6px;border-radius:18px;background:#FBF6EE;font:400 15.5px/1.3 "Noto Serif Georgian";display:flex;flex-direction:column;justify-content:space-between;gap:6px}
+.eg small{display:block;font-size:12.5px;color:#9A8B7C}
+.eg b{font:600 30px/1 "Cormorant Garamond";color:#A88449}
+.eg b i{font:500 22px/1 "Noto Serif Georgian";font-style:normal}
+.promo{position:absolute;top:1358px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:20px 46px;border-radius:50px;font:500 27px/1 "Noto Serif Georgian";color:#fff;background:linear-gradient(135deg,#D9BC7E,#A88449);box-shadow:0 18px 36px -16px rgba(120,90,40,.6)}
+.promo b{font:600 34px/1 "Cormorant Garamond"}
+.cta{position:absolute;top:1446px;left:0;right:0;text-align:center;font:500 25px/1 "Noto Serif Georgian";color:#8E6B33}
+.ft{position:absolute;bottom:60px;left:0;right:0;text-align:center;font:400 21px/1 "Noto Serif Georgian";letter-spacing:.3em;text-indent:.3em;color:#7C6E60}
+.pearl{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0%,#F3EEE6 45%,#CFC3B2 100%);box-shadow:0 2px 4px rgba(90,70,40,.25)}
+</style></head><body>
+<svg class="pat" width="1280" height="1600"><defs><pattern id="p" width="120" height="120" patternUnits="userSpaceOnUse"><g fill="none" stroke="#8C6E3F" stroke-width="1.2"><circle cx="60" cy="60" r="6"/><path d="M60 40 q8 10 0 20 q-8 -10 0 -20 M80 60 q-10 8 -20 0 q10 -8 20 0 M60 80 q-8 -10 0 -20 q8 10 0 20 M40 60 q10 -8 20 0 q-10 8 -20 0"/></g></pattern></defs><rect width="1280" height="1600" fill="url(#p)"/></svg>
+<div id="pearls"></div>
+<div class="hd"><h1>ამბავი</h1><p>3D ციფრული მოსაწვევები</p><h2>✦ ჩვენი პაკეტები ✦</h2></div>
+<div class="cards">
+  <div class="c"><h3>კლასიკა</h3><p class="s">ლამაზი და მარტივი</p><div class="pr">99<small>₾</small></div><div class="ln"></div>
+    <ul><li>დიზაინი ჩვენი კოლექციიდან</li><li>სახელები, თარიღი, განრიგი</li><li>რუკა და უკუთვლა</li><li>დასწრების დადასტურება</li><li>მუსიკა</li></ul></div>
+  <div class="c top"><div class="badge">✨ ყველაზე პოპულარული</div><h3>პრემიუმი</h3><p class="s">თქვენი ისტორიით</p><div class="pr">169<small>₾</small></div><div class="ln"></div>
+    <ul><li>ყველაფერი „კლასიკიდან“</li><li>თქვენი ფოტოები და ისტორია</li><li>ფერებისა და შრიფტის მორგება</li><li>3D გახსნა</li><li>თქვენი არჩეული სიმღერა</li><li>სურვილების კონვერტი</li></ul></div>
+  <div class="c"><h3>3D ექსკლუზივი</h3><p class="s">დასამახსოვრებელი</p><div class="pr">289<small>₾</small></div><div class="ln"></div>
+    <ul><li>ყველაფერი „პრემიუმიდან“</li><li>უნიკალური დიზაინი თქვენთვის</li><li>ინდივიდუალური 3D ილუსტრაციები</li><li>ცოცხალი 3D ეფექტები</li><li>ვიდეო-მოსაწვევი საჩუქრად</li></ul></div>
+</div>
+<div class="ex"><h4>დამატებითი მომსახურება<span>სურვილისამებრ, ნებისმიერ პაკეტთან</span></h4>
+  <div class="eg">
+    <div>🎬 ვიდეო-მოსაწვევი<small>სთორისთვის და გასაგზავნად</small><b>+39 <i>₾</i></b></div>
+    <div>🌍 მეორე ენა<small>ინგლისური ან რუსული</small><b>+29 <i>₾</i></b></div>
+    <div>📅 „დაიმახსოვრე თარიღი“<small>წინასწარი შეტყობინება სტუმრებს</small><b>+59 <i>₾</i></b></div>
+    <div>🙏 მადლობის გვერდი<small>ფოტოებით, ღონისძიების შემდეგ</small><b>+49 <i>₾</i></b></div>
+    <div>🎉 მეორე ღონისძიება<small>მაგ. ნიშნობა ან ნათლობა</small><b>+49 <i>₾</i></b></div>
+    <div>⚡ სასწრაფო შესრულება<small>უპირატესად, რიგის გარეშე</small><b>+39 <i>₾</i></b></div>
+    <div>🔳 QR კოდი<small>ქაღალდის მოსაწვევზე</small><b>+19 <i>₾</i></b></div>
+  </div></div>
+<div class="promo">🎁 პირველი 10 კლიენტისთვის <b>−20%</b></div>
+<div class="cta">💌 შეკვეთისთვის მოგვწერეთ პირად შეტყობინებაში</div>
+<div class="ft">ქორწილი · ნათლობა · დაბადების დღე · კორპორატიული</div>
+<script>
+/* pearl strands in the top corners */
+let h = ""; for (const [ox, sx] of [[0, 1], [1280, -1]]) for (let s = 0; s < 2; s++) for (let i = 0; i < 16; i++){ const t = i / 15, x = ox + sx * (10 + t * (200 - s * 70)), y = 10 + Math.sin(t * Math.PI) * (90 - s * 40) + t * (40 + s * 30), r = 6 + Math.sin(t * Math.PI) * 4 - s * 1.5;
+  h += `<i class="pearl" style="left:${x - r}px;top:${y - r}px;width:${r * 2}px;height:${r * 2}px"></i>`; }
+document.getElementById("pearls").innerHTML = h;
+document.fonts.ready.then(() => setTimeout(() => window.__ready = true, 400));
+</script></body></html>

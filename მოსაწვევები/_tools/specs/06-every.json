@@ -1,0 +1,125 @@
+{
+ "song": "festa",
+ "segs": [
+  {
+   "type": "clip",
+   "dir": "w-rings",
+   "from": 3.4,
+   "dur": 1.875,
+   "speed": 1.1,
+   "punch": true,
+   "label": "💍 ქორწილი",
+   "labelY": 1620,
+   "tr": "cut",
+   "trd": 0.22
+  },
+  {
+   "type": "clip",
+   "dir": "w-chapel",
+   "from": 3.4,
+   "dur": 1.875,
+   "speed": 1.1,
+   "punch": true,
+   "label": "🕯 ჯვრისწერა",
+   "labelY": 1620,
+   "tr": "flash",
+   "trd": 0.22
+  },
+  {
+   "type": "clip",
+   "dir": "v-bottle",
+   "from": 3,
+   "dur": 1.875,
+   "speed": 1.1,
+   "punch": true,
+   "label": "🍾 ნიშნობა",
+   "labelY": 1620,
+   "tr": "flash",
+   "trd": 0.22
+  },
+  {
+   "type": "clip",
+   "dir": "v-cranes",
+   "from": 3,
+   "dur": 1.875,
+   "speed": 1.1,
+   "punch": true,
+   "label": "🕊 ნათლობა",
+   "labelY": 1620,
+   "tr": "flash",
+   "trd": 0.22
+  },
+  {
+   "type": "clip",
+   "dir": "v-vinyl",
+   "from": 2.9,
+   "dur": 1.875,
+   "speed": 1.1,
+   "punch": true,
+   "label": "💿 დაბადების დღე",
+   "labelY": 1620,
+   "tr": "flash",
+   "trd": 0.22
+  },
+  {
+   "type": "clip",
+   "dir": "v-planets",
+   "from": 3.2,
+   "dur": 1.875,
+   "speed": 1.1,
+   "punch": true,
+   "label": "🚀 საბავშვო წვეულება",
+   "labelY": 1620,
+   "tr": "flash",
+   "trd": 0.22
+  },
+  {
+   "type": "clip",
+   "dir": "v-curtain",
+   "from": 3,
+   "dur": 1.875,
+   "speed": 1.1,
+   "punch": true,
+   "label": "🎭 კორპორატიული",
+   "labelY": 1620,
+   "tr": "flash",
+   "trd": 0.22
+  },
+  {
+   "type": "clip",
+   "dir": "v-balloons",
+   "from": 3,
+   "dur": 1.875,
+   "speed": 1.1,
+   "punch": true,
+   "label": "🎈 იუბილე",
+   "labelY": 1620,
+   "tr": "flash",
+   "trd": 0.22
+  },
+  {
+   "type": "card",
+   "dur": 2.25,
+   "title": "თქვენი დღესასწაული\nრომელია? 👇",
+   "sub": "მოსაწვევს ნებისმიერი ღონისძიებისთვის შევქმნით",
+   "tr": "flash",
+   "trd": 0.25
+  }
+ ],
+ "texts": [
+  {
+   "from": 0,
+   "to": 2.2,
+   "text": "ყოველი დღესასწაულისთვის —\nთავისი სამყარო ✨",
+   "y": 560,
+   "size": 58
+  }
+ ],
+ "cover": {
+  "dir": "v-vinyl",
+  "idx": 100,
+  "kicker": "ამბავი",
+  "title": "ყოველი\nდღესასწაულისთვის",
+  "sub": "ქორწილიდან დაბადების დღემდე ✨"
+ }
+}

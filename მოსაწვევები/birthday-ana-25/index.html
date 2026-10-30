@@ -1,0 +1,137 @@
+<!doctype html>
+<!-- ამბავი · დაბადების დღის მოსაწვევი „birthday-ana-25“ — დიზაინი „ფერადი წვეულება“
+     გახსნა: 3D ვარდისფერი კონვერტი ბეჭდით და კონფეტით (js/envelope3d.js). ტექსტები: js/config.js · სტილი: css/theme.css
+     ბუშტები და „25“ (images/hero.jpg, balloons.png) 3D-ში დახატულია ამ დიზაინისთვის. -->
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ანას 25 წლის იუბილე 🎉</title>
+<meta name="description" content="ანას 25 წლის იუბილე · 5 დეკემბერი 2026, თბილისი">
+<meta name="theme-color" content="#FFF4E6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fredoka:wght@400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/theme.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+
+<!-- ============ GATE ============ -->
+<div class="gate" id="gate" role="button" tabindex="0" aria-label="მოსაწვევის გახსნა" data-stages="s1:0,s2:2600" data-open="3300" data-burst="420:confetti::90;1500:confetti::70" hidden>
+  <img class="g-bal l" src="images/balloons.png" alt="" aria-hidden="true">
+  <img class="g-bal r" src="images/balloons.png" alt="" aria-hidden="true">
+  <p class="g-top"><span class="g-script">You're invited!</span><span class="g-sub">🎉 <span data-t="host"></span> · <span data-t="age"></span> 🎉</span></p>
+  <div class="g-fallback" aria-hidden="true"><div class="gf-env"><div class="gf-flap"></div><div class="gf-seal" data-t="monogram"></div></div></div>
+  <p class="g-hint"><svg><use href="#i-gift"/></svg><span data-i18n="tapHint"></span></p>
+</div>
+<script>try{document.getElementById("gate").hidden=false;document.documentElement.classList.add("gated")}catch(e){}</script>
+
+<main class="col">
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="hero-photo kb" data-photo="heroPhoto"></div>
+    <p class="hero-line hx" style="--d:.5" data-t="heroLine"></p>
+    <div class="torn pink" aria-hidden="true"></div>
+  </header>
+
+  <!-- ============ DEAR FRIENDS + date ============ -->
+  <section class="sec s-pink center">
+    <h1 class="title" data-anim="up"><span class="fun" data-t="host"></span> <span class="age" data-t="age"></span></h1>
+    <h2 class="h2" data-anim="up" data-t="dear"></h2>
+    <p class="text" data-anim="up" data-t="lead"></p>
+    <p class="date-line" data-anim="up"><i></i><span data-t="dots"></span><i></i></p>
+    <p class="caps" data-anim="up" data-t="weekdayCity"></p>
+  </section>
+
+  <!-- ============ PLACE: a card over the balloons ============ -->
+  <section class="place-sec">
+    <div class="torn top yellow" aria-hidden="true"></div>
+    <img class="pl-bal" src="images/balloons.png" alt="" aria-hidden="true">
+    <div class="pl-card" data-anim="up">
+      <p class="caps" data-i18n="placeTitle"></p>
+      <h3 data-t="place"></h3>
+      <p class="addr" data-t="placeAddr"></p>
+      <a class="btn fun-btn js-map" href="#" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg><span data-i18n="mapBtn"></span></a>
+    </div>
+  </section>
+
+  <!-- ============ THE PLAN ============ -->
+  <section class="sec s-white" data-section="events">
+    <div class="torn top white" aria-hidden="true"></div>
+    <h2 class="h-script center" data-anim="up">Party time</h2>
+    <p class="caps center" data-anim="up" data-i18n="dayTitle"></p>
+    <ol class="timing" id="day"></ol>
+  </section>
+
+  <!-- ============ DRESS CODE ============ -->
+  <section class="sec s-blue center">
+    <div class="torn top blue" aria-hidden="true"></div>
+    <h2 class="h-script" data-anim="up">Dress code</h2>
+    <p class="h2" data-anim="up" data-t="dressCode"></p>
+    <p class="text" data-anim="up" data-t="dressNote"></p>
+    <div class="palette" id="palette" data-anim="up"></div>
+  </section>
+
+  <!-- ============ WISHES ============ -->
+  <section class="sec s-yellow center">
+    <div class="torn top yellow" aria-hidden="true"></div>
+    <svg class="big-ic" data-anim="zoom"><use href="#i-gift"/></svg>
+    <h2 class="h2" data-anim="up" data-i18n="wishTitle"></h2>
+    <p class="text" data-anim="up" data-t="wishes"></p>
+    <p class="h-script small" data-anim="up" data-t="wishLine"></p>
+  </section>
+
+  <!-- ============ ME ============ -->
+  <section class="me">
+    <div class="me-photo kb" data-photo="mePhoto"></div>
+    <div class="torn top yellow flip" aria-hidden="true"></div>
+    <div class="torn pink" aria-hidden="true"></div>
+  </section>
+
+  <!-- ============ QUESTIONS + COUNTDOWN ============ -->
+  <section class="sec s-pink center">
+    <p class="text" data-anim="up" data-t="questions"></p>
+    <a class="btn fun-btn js-ask" href="#" target="_blank" rel="noopener" data-anim="up"><svg><use href="#i-wa"/></svg><span data-i18n="ask"></span></a>
+    <h2 class="h-script mt" data-anim="up">See you in...</h2>
+    <div class="count" id="count" data-anim="up"></div>
+    <p class="caps" data-anim="up" data-i18n="toDay"></p>
+    <div class="ctas" data-anim="up" data-ctas></div>
+  </section>
+
+  <!-- ============ RSVP ============ -->
+  <section class="sec s-white" id="rsvp">
+    <div class="torn top white" aria-hidden="true"></div>
+    <h2 class="h-script center" data-anim="up">RSVP</h2>
+    <p class="caps center" data-anim="up" data-i18n="rsvpTitle"></p>
+    <div class="rsvp" id="rsvp-box" data-anim="up"></div>
+  </section>
+
+  <footer class="foot">
+    <div class="torn top yellow" aria-hidden="true"></div>
+    <p class="f-big" data-t="thanks"></p>
+    <p class="caps" data-t="dots"></p>
+  </footer>
+</main>
+
+<template id="tpl-event"><li class="ev" data-anim="up"><span class="ev-time" data-f="time"></span><div class="ev-body"><h3 data-f="title"></h3><p data-f="note"></p></div></li></template>
+
+<script src="js/config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/music.js"></script>
+<script src="js/core.js"></script>
+<script>
+/* map, WhatsApp question, dress-code colours */
+(function(){ var C = window.CONFIG, wa = String(C.whatsapp || "").replace(/\D/g, "");
+  document.querySelectorAll(".js-map").forEach(function(a){ a.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.placeMap || ""); });
+  document.querySelectorAll(".js-ask").forEach(function(a){ a.href = "https://wa.me/" + wa + "?text=" + encodeURIComponent("გამარჯობა! კითხვა მაქვს წვეულებასთან დაკავშირებით:"); });
+  var pal = document.getElementById("palette"); if (pal) pal.innerHTML = (C.palette || []).map(function(c){ return "<i style=\"background:" + c + "\"></i>"; }).join("");
+})();
+</script>
+<script src="js/envelope3d.js"></script>
+</body>
+</html>
